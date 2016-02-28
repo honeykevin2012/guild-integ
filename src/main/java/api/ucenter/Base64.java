@@ -62,7 +62,7 @@ import java.io.Writer;
  * modified: 22 September 2000
  *
  * @author Kevin Kelley (kelley@ruralnet.net)
- * @version 1.3 git
+ * @version 1.3 git 1
  */
 public class Base64 {
 
