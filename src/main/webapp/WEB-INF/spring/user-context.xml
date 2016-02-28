@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.user.persistence.dao.UserDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="userDataItemsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.user.persistence.dao.UserDataItemsDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="userActiveCodeDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.user.persistence.dao.UserActiveCodeDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="userCustomServiceDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserCustomServiceDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userShoppingCartDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserShoppingCartDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userCustomAboutDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserCustomAboutDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userGameVersionDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserGameVersionDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userAddressInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserAddressInfoDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userOrderDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserOrderDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userOrderItemDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserOrderItemDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userOrderItemVirtualDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserOrderItemVirtualDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userVipGroupDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserVipGroupDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userSessionTokenDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserSessionTokenDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userGameDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserGameDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userGameDeductingProcessDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserGameDeductingProcessDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userGameAdaptorDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.adaptor.UserGameAdaptorDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userSignDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserSignDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="userCreditsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserCreditsDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+     <bean id="userCommentDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserCommentDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+     <bean id="userCenterNoticeDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.user.persistence.dao.UserCenterNoticeDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+</beans>

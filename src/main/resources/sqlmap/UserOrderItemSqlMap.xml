@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserOrderItemDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id AS id,
+		product_id AS productId,
+		product_name AS productName,
+		order_id AS orderId,
+		product_price AS productPrice,
+		count AS count,
+		total_amount AS totalAmount,
+		pay_amount AS payAmount,
+		discount_amount AS discountAmount,
+		is_virtual,
+		status AS status FROM user_order_item
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserOrderItem" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.productId != null and params.productId != ''">
+					and product_id = #{params.productId}
+				</if>
+				<if test="params.productName != null and params.productName != ''">
+					and product_name = #{params.productName}
+				</if>
+				<if test="params.orderId != null and params.orderId != ''">
+					and order_id = #{params.orderId}
+				</if>
+				<if test="params.productPrice != null and params.productPrice != ''">
+					and product_price = #{params.productPrice}
+				</if>
+				<if test="params.count != null and params.count != ''">
+					and count = #{params.count}
+				</if>
+				<if test="params.totalAmount != null and params.totalAmount != ''">
+					and total_amount = #{params.totalAmount}
+				</if>
+				<if test="params.payAmount != null and params.payAmount != ''">
+					and pay_amount = #{params.payAmount}
+				</if>
+				<if test="params.discountAmount != null and params.discountAmount != ''">
+					and discount_amount = #{params.discountAmount}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and status = #{params.status}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserOrderItem" parameterType="int">
+		SELECT  id AS id, product_id AS productId, product_name AS productName, order_id AS orderId, product_price AS productPrice, count AS count, total_amount AS totalAmount, pay_amount AS payAmount, discount_amount AS discountAmount, status AS status FROM user_order_item WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserOrderItem" parameterType="com.game.user.domain.UserOrderItem">
+		SELECT  id AS id, product_id AS productId, product_name AS productName, order_id AS orderId, 
+		product_price AS productPrice, count AS count, total_amount AS totalAmount, pay_amount AS payAmount, 
+		discount_amount AS discountAmount, is_virtual, status AS status FROM user_order_item
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="productId != null and productId != ''">
+					and product_id = #{productId}
+				</if>
+				<if test="productName != null and productName != ''">
+					and product_name = #{productName}
+				</if>
+				<if test="orderId != null and orderId != ''">
+					and order_id = #{orderId}
+				</if>
+				<if test="productPrice != null and productPrice != ''">
+					and product_price = #{productPrice}
+				</if>
+				<if test="count != null and count != ''">
+					and count = #{count}
+				</if>
+				<if test="totalAmount != null and totalAmount != ''">
+					and total_amount = #{totalAmount}
+				</if>
+				<if test="payAmount != null and payAmount != ''">
+					and pay_amount = #{payAmount}
+				</if>
+				<if test="discountAmount != null and discountAmount != ''">
+					and discount_amount = #{discountAmount}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserOrderItem" parameterType="int">
+		SELECT  id AS id, product_id AS productId, product_name AS productName, order_id AS orderId, 
+		product_price AS productPrice, count AS count, total_amount AS totalAmount, pay_amount AS payAmount, 
+		discount_amount AS discountAmount, is_virtual, status AS status FROM user_order_item
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserOrderItem">
+		INSERT INTO user_order_item
+		(
+		    product_id, product_name, order_id, product_price, count, 
+		    total_amount, pay_amount, discount_amount, status, is_virtual)
+		values 
+		(
+		    #{productId} , #{productName} , #{orderId} , #{productPrice} , #{count} , 
+		    #{totalAmount} , #{payAmount} , #{discountAmount} , #{status}, #{isVirtual} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserOrderItem">
+		UPDATE user_order_item 
+		SET  id=#{id} , product_id=#{productId} , product_name=#{productName} , order_id=#{orderId} , product_price=#{productPrice} , count=#{count} , total_amount=#{totalAmount} , pay_amount=#{payAmount} , discount_amount=#{discountAmount} , status=#{status}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_order_item WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_order_item WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<resultMap id="itemResultMap" type="com.game.user.domain.UserOrderItem">
+        <id property="id" column="id" />
+        <result property="productId" column="product_id" />
+        <result property="productName" column="product_name" />
+       	<result property="productPrice" column="product_price" />
+        <result property="count" column="count" />
+        <result property="productPhoto" column="product_photo" />
+         <result property="isVirtual" column="is_virtual" />
+        <collection property="virtuals" ofType="com.game.user.domain.UserOrderItemVirtual">
+        	<id property="id" column="v_id" />
+        	<id property="codeValue" column="code_value" />
+        	<id property="cardNumber" column="card_number" />
+        	<id property="codeId" column="code_id" />
+        	<id property="orderItemId" column="order_item_id" />
+        </collection>
+    </resultMap>
+	
+	<select id="selectByOrderId" resultMap="itemResultMap" parameterType="java.lang.String">
+		SELECT
+		  i.id AS id,
+		  i.product_id    AS product_id,
+		  i.product_name  AS product_name,
+		  i.product_price AS product_price,
+		  i.count as count,
+		  a.path as product_photo,
+		  v.id as v_id,
+		  v.order_item_id as order_item_id,
+		  v.code_value as code_value,
+		  v.card_number as card_number,
+		  v.code_id as code_id,
+		  i.is_virtual as is_virtual
+		FROM user_order_item i left join platform_attachment a
+		ON i.product_id = a.relation_id AND a.channel = 1000 AND a.is_default = 1 AND a.size = 200200
+		left join user_order_item_virtual v on i.id=v.order_item_id
+		WHERE i.order_id = #{orderId}
+	</select>
+</mapper>

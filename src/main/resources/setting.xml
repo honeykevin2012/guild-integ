@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<setting> 
+	<signMessageTemplate title="用户签到积分赠送" contentTemplate="用户签到获得XX积分, 奖励YYN币." />
+	<levelUpMessageTemplate title="用户级别晋升奖励" contentTemplate="恭喜, 您的会员等级晋升, 奖励YYN币." />
+	
+	<setting name="userSignDesc" value="签到功能说明:每天只能签到一次（按服务器系统时间为准)每日签到，领取2积分，5N币"/>
+	<setting name="text_guild_shop" value="仅由公会管理员使用公会资金进行购买."/>
+	<setting name="text_personal_shop" value="只允许个人使用游戏金币或充值N币进行购买."/>
+	<setting name="text_exchange_rule" value="N币游戏平台是广大手游玩家的福利世界。在游戏中不断的积累金币，就会相应获得等值的N币用来在N币商城兑换您心仪的商品."/>
+	<setting name="text_game_rule" value="下游戏，打金币，赚N币，买宝贝！."/>
+	<setting name="text_guild_desc" value="建设成为有理想有目标的和谐、热情，友情，亲情为一体的最强大最团结的公会."/>
+	<setting name="guild_notice_title_default" value="公会公告"/>
+	<setting name="guild_notice_content_default" value="工会捐赠决额度决定工会等级成长和工会成员上限，兄弟们捐的钱日后老大会买东西送小弟，工会的成长离不开大家的力量哦."/>
+	
+	<basicSetPoints title="用户积分设置">
+		<point key="register" exp="2"/>
+		<point key="login" exp="2"/>
+		<point key="sign" exp="2"/>
+		<point key="bindMobile" exp="2"/>
+		<point key="downloadGame" exp="2"/>
+		<point key="feedback" exp="2"/>
+		<point key="startClient" exp="2"/>
+		<point key="shareActive" exp="2"/>
+		<point key="shareProduct" exp="2"/>
+		<point key="shareMedia" exp="2"/>
+		<point key="createGuild" exp="2"/>
+	</basicSetPoints>
+	
+	<messageUserJoinGuild title="公会邮件:用户入会申请">
+		<messageUserJoinGuildTemplate key="joinGuild" value="用户【{0}】申请加入公会, 请到审批界面进行审核." />
+	</messageUserJoinGuild>
+	<messageUserJoinGuildApply title="公会邮件:入会申请审批通过">
+		<messageUserJoinGuildApplyTemplate key="joinGuildApply" value="恭喜您, 【{0}】公会已经同意了您的入会申请." />
+	</messageUserJoinGuildApply>
+	
+	<messageUserOrderFailed title="订单提醒:很抱歉, 您所购买的商品订单支付失败">
+		<messageUserOrderFailedTemplate key="orderFailed" value="您所购买的商品订单支付失败;\r\n订单号:{0};\r\n商品名称:\r\n{1}\r\n订单金额:{2}" />
+	</messageUserOrderFailed>
+	<messageUserOrderSuccess title="订单提醒:恭喜您, 您所购买的商品订单已支付成功">
+		<messageUserOrderSuccessTemplate key="orderSuccess" value="您购买的商品已下单成功, 请注意查收;\r\n订单号:{0};\r\n商品名称:\r\n{1}\r\n订单金额:{2}" />
+	</messageUserOrderSuccess>
+	
+	<messageUserSign title="用户签到奖励">
+		<messageUserSignTemplate key="sign" value="用户签到获得{0}积分, 奖励{1}N币." exp="2" gold="5" />
+	</messageUserSign>
+	<!-- 0 from guild-->
+	<messageUserRedEnvelope title="【{0}】公会红包奖励">
+		<messageUserRedEnvelopeTemplate key="redEnvelope" value="恭喜您获得红包, 红包金额{0}N币." />
+	</messageUserRedEnvelope>
+	<!-- 0 from user, 1 item name,  -->
+	<messageUserPractic title="【{0}】赠送了礼物给您, 请注意查收.">
+		<messageUserPracticTemplate key="practic" value="【{0}】赠送了以下物品给您, 请查收;\r\n【{1}】" />
+	</messageUserPractic>
+	
+	<!-- 0 from user, 1 item name,  -->
+	<messageUserPracticVirtual title="【{0}】赠送了礼物给您, 请注意查收.">
+		<messageUserPracticVirtualTemplate key="virtual" value="【{0}】赠送了以下物品给您, 请查收;\r\n【{1}】" />
+	</messageUserPracticVirtual>
+	
+	<messageCreateGuild title="系统邮件:用户创建公会奖励.">
+		<messageCreateGuildTemplate key="createGuild" value="用户创建公会获得{0}积分, 奖励{1}N币." exp="5" gold="2"/>
+	</messageCreateGuild>
+	
+	<messageUserLevelUp title="系统邮件:用户级别晋升奖励">
+		<messageUserLevelUpTemplate key="levelUp" value="用户级别晋升到{0}级, 系统奖励{1}N币." />
+	</messageUserLevelUp>
+	
+	<messageUserAtRegister title="系统邮件:用户一键注册信息提醒">
+		<messageUserAtRegisterTemplate key="atRegister" value="恭喜您成为N币游戏注册用户, 请注意保存您的账号信息, 可以点击头像, 在账号信息中修改登录账户名(仅限一次), 方便记忆.\r\n 登录账号:{0}\r\n密码:{1}\r\n祝您在N币游戏平台玩的开心." />
+	</messageUserAtRegister>
+	
+	<messageUserEdit title="系统邮件:完善用户资料奖励">
+		<messageUserEditTemplate key="sex"     value="修改了性别奖励{0}N币.\r\n"  gold="2" />
+		<messageUserEditTemplate key="avatar"  value="上传了头像奖励{0}N币.\r\n"  gold="5" />
+		<messageUserEditTemplate key="qq"      value="绑定了QQ奖励{0}N币.\r\n"    gold="1" />
+		<messageUserEditTemplate key="phone"   value="绑定了电话奖励{0}N币.\r\n"  gold="10" />
+		<messageUserEditTemplate key="email"   value="绑定了邮箱奖励{0}N币.\r\n"   gold="3" />
+		<messageUserEditTemplate key="nickname"    value="修改了昵称奖励{0}N币.\r\n"   gold="2" />
+		<messageUserEditTemplate key="birthday" value="修改了生日奖励{0}N币.\r\n"   gold="2" />
+		<messageUserEditTemplate key="address" value="绑定了地址奖励{0}N币.\r\n"   gold="2" />
+		<messageUserEditTemplate key="educational" value="完善了学历奖励{0}N币.\r\n"   gold="1" />
+	</messageUserEdit>
+	
+</setting>

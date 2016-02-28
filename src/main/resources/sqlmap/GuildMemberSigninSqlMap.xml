@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildMemberSigninDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id,
+		user_id,
+		guild_id,
+		signin_time FROM guild_member_signin
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildMemberSignin" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.guildId != null and params.guildId != ''">
+					and guild_id = #{params.guildId}
+				</if>
+				<if test="params.signinTime != null and params.signinTime != ''">
+					and signin_time = #{params.signinTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildMemberSignin" parameterType="int">
+		SELECT  id, user_id, guild_id, signin_time FROM guild_member_signin WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildMemberSignin" parameterType="com.game.guild.domain.GuildMemberSignin">
+		SELECT  id, user_id, guild_id, signin_time FROM guild_member_signin
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="guildId != null and guildId != ''">
+					and guild_id = #{guildId}
+				</if>
+				<if test="signinTime != null and signinTime != ''">
+					and signin_time = #{signinTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildMemberSignin" parameterType="int">
+		SELECT  id, user_id, guild_id, signin_time FROM guild_member_signin
+	</select>
+	
+	<select id="selectSigninCount" resultType="int" parameterType="int">
+		SELECT count(id) as count
+		FROM guild_member_signin
+		where guild_id=#{guildId} and date(signin_time)=curdate()
+	</select>
+	
+	<select id="selectIsSignin" resultType="com.game.guild.domain.GuildMemberSignin" parameterType="int">
+		SELECT  id, user_id, guild_id, signin_time FROM guild_member_signin 
+		where user_id=${userId} and guild_id=${guildId} and DATE_FORMAT (signin_time,'%Y-%m-%d') = '${queryDate}'
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildMemberSignin">
+		INSERT INTO guild_member_signin
+		(
+		    user_id, guild_id)
+		values 
+		(
+		    #{userId} , #{guildId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildMemberSignin">
+		UPDATE guild_member_signin 
+		SET  id=#{id} , user_id=#{userId} , guild_id=#{guildId} WHERE id=#{id}
+	</update>
+	<delete id="deleteByUserAndGuild" parameterType="map">
+		<![CDATA[
+			DELETE FROM guild_member_signin WHERE user_id=#{userId} and guild_id=#{guildId}
+		]]>
+	</delete>
+	<delete id="deleteByGuildId" parameterType="map">
+		<![CDATA[
+			DELETE FROM guild_member_signin WHERE guild_id=#{guildId}
+		]]>
+	</delete>
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_member_signin WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_member_signin WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.6.2.201410090854-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+	</configs>
+	<autoconfigs>
+		<config>src/main/webapp/WEB-INF/spring/platform-context.xml</config>
+		<config>src/main/webapp/WEB-INF/spring/user-context.xml</config>
+		<config>src/main/webapp/WEB-INF/spring/applicationContext.xml</config>
+		<config>src/main/webapp/WEB-INF/spring/payment-context.xml</config>
+		<config>src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml</config>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

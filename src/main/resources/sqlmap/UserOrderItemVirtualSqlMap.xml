@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserOrderItemVirtualDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		order_item_id,
+		code_value,
+		card_number,
+		code_id FROM user_order_item_virtual
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserOrderItemVirtual" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.orderItemId != null and params.orderItemId != ''">
+					and order_item_id = #{params.orderItemId}
+				</if>
+				<if test="params.codeValue != null and params.codeValue != ''">
+					and code_value = #{params.codeValue}
+				</if>
+				<if test="params.cardNumber != null and params.cardNumber != ''">
+					and card_number = #{params.cardNumber}
+				</if>
+				<if test="params.codeId != null and params.codeId != ''">
+					and code_id = #{params.codeId}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserOrderItemVirtual" parameterType="int">
+		SELECT  id, order_item_id, code_value, card_number, code_id FROM user_order_item_virtual WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserOrderItemVirtual" parameterType="com.game.user.domain.UserOrderItemVirtual">
+		SELECT  id, order_item_id, code_value, card_number, code_id FROM user_order_item_virtual
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="orderItemId != null and orderItemId != ''">
+					and order_item_id = #{orderItemId}
+				</if>
+				<if test="codeValue != null and codeValue != ''">
+					and code_value = #{codeValue}
+				</if>
+				<if test="cardNumber != null and cardNumber != ''">
+					and card_number = #{cardNumber}
+				</if>
+				<if test="codeId != null and codeId != ''">
+					and code_id = #{codeId}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserOrderItemVirtual" parameterType="int">
+		SELECT  id, order_item_id, code_value, card_number, code_id FROM user_order_item_virtual
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserOrderItemVirtual">
+		INSERT INTO user_order_item_virtual
+		(
+		    order_item_id, code_value, card_number, code_id)
+		values 
+		(
+		    #{orderItemId} , #{codeValue} , #{cardNumber} , #{codeId} 
+		)
+	</insert>
+	
+	<insert id="insertVirtuals" useGeneratedKeys="true" parameterType="com.game.user.domain.UserOrderItemVirtual">
+		INSERT INTO user_order_item_virtual
+		(
+		    order_item_id, code_value, card_number, code_id)
+		values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+			(#{item.orderItemId} , #{item.codeValue} , #{item.cardNumber}, #{item.codeId})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserOrderItemVirtual">
+		UPDATE user_order_item_virtual 
+		SET  id=#{id} , order_item_id=#{orderItemId} , code_value=#{codeValue} , card_number=#{cardNumber} , code_id=#{codeId}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_order_item_virtual WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_order_item_virtual WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

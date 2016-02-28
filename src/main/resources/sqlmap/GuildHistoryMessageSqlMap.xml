@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildHistoryMessageDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		guild_id,
+		`type`,
+		`from`,
+		`to`,
+		content,
+		create_time FROM guild_history_message
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildHistoryMessage" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.guildId != null and params.guildId != ''">
+					and guild_id = #{params.guildId}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and `type` = #{params.type}
+				</if>
+				<if test="params.from != null and params.from != ''">
+					and `from` = #{params.from}
+				</if>
+				<if test="params.to != null and params.to != ''">
+					and `to` = #{params.to}
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and content = #{params.content}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildHistoryMessage" parameterType="int">
+		SELECT  id, guild_id, `type`, `from`, `to`, content, create_time FROM guild_history_message WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildHistoryMessage" parameterType="com.game.guild.domain.GuildHistoryMessage">
+		SELECT  id, guild_id, `type`, `from`, `to`, content, create_time FROM guild_history_message
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="guildId != null and guildId != ''">
+					and guild_id = #{guildId}
+				</if>
+				<if test="type != null and type != ''">
+					and `type` = #{type}
+				</if>
+				<if test="from != null and from != ''">
+					and `from` = #{from}
+				</if>
+				<if test="to != null and to != ''">
+					and `to` = #{to}
+				</if>
+				<if test="content != null and content != ''">
+					and content = #{content}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildHistoryMessage" parameterType="int">
+		SELECT  id, guild_id, `type`, `from`, `to`, content, create_time FROM guild_history_message
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildHistoryMessage">
+		INSERT INTO guild_history_message
+		(
+		    guild_id, `type`, `from`, `to`, content)
+		values 
+		(
+		    #{guildId} , #{type} , #{from} , #{to} , #{content} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildHistoryMessage">
+		UPDATE guild_history_message 
+		SET  id=#{id} , guild_id=#{guildId} , type=#{type} , from=#{from} , to=#{to} , content=#{content} , create_time=#{createTime}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_history_message WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_history_message WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

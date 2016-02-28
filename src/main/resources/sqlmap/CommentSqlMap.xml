@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.news.persistence.dao.CommentDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+SELECT
+  c.id         AS id,
+  c.article_id AS articleId,
+  c.user_id    AS userId,
+  c.content    AS content,
+  u.mobile_no  AS mobileNo
+FROM zst_comment c
+  LEFT JOIN zst_user u
+    ON c.user_id = u.user_id
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.news.domain.Comment" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and c.id = #{params.id}
+				</if>
+				<if test="params.articleId != null and params.articleId != ''">
+					and c.article_id = #{params.articleId}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and c.user_id = #{params.userId}
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and c.content = #{params.content}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and c.type = #{params.type}
+				</if>
+			</where>
+		order by c.id desc 
+	</select>
+	
+	<select id="select" resultType="com.game.news.domain.Comment" parameterType="int">
+		select  id as id, article_id as articleId, user_id as userId, content as content from zst_comment where id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.news.domain.Comment" parameterType="com.game.news.domain.Comment">
+		select  id as id, article_id as articleId, user_id as userId, content as content from zst_comment
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="articleId != null and articleId != ''">
+					and article_id = #{articleId}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="content != null and content != ''">
+					and content = #{content}
+				</if>
+			</where>
+		order by id desc 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.news.domain.Comment" parameterType="int">
+		select  id as id, article_id as articleId, user_id as userId, content as content from zst_comment
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.news.domain.Comment">
+		insert into zst_comment
+		(
+			 id, article_id, user_id, content,create_time)
+		values 
+		(
+			 #{id} , #{articleId} , #{userId} , #{content} ,now())
+	</insert>
+
+	<update id="update" parameterType="com.game.news.domain.Comment">
+		update zst_comment 
+		set  id=#{id} , article_id=#{articleId} , user_id=#{userId} , content=#{content}  where id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			delete from zst_comment where id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	delete from zst_comment where id in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

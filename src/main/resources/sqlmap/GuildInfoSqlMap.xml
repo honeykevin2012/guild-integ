@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildInfoDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT
+		  g.id             AS id,
+		  g.name           AS NAME,
+		  g.remark         AS remark,
+		  g.level          AS LEVEL,
+		  g.icon,
+		  g.member_count   AS memberCount,
+		  g.create_time    AS createTime,
+		  g.currency       AS currency,
+		  g.discount_id    AS discountId,
+		  g.slogan         AS slogan,
+		  g.create_user_id AS create_user_id,
+		  g.status         AS STATUS,
+		  u.user_name      AS user_name,
+		  u.nick_name      AS nick_name,
+		  lv.name as level_name,
+		  (CASE 
+		  WHEN s.is_admin IS NULL or s.status is null THEN -1 
+		  when s.status='0' then -2
+		  ELSE s.is_admin END ) AS joined
+		FROM guild_info g
+		  LEFT JOIN USER u
+		    ON g.create_user_id = u.id left join guild_level lv on g.level=lv.id
+		  LEFT JOIN (SELECT
+		               guild_id, status,
+		               is_admin
+		             FROM guild_members
+		             WHERE user_id = #{params.userId}) s
+		    ON g.id = s.guild_id
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildInfo" useCache="true">
+		<include refid="commonSelect"/>
+			<where>
+				g.status='1'
+				<if test="params.id != null and params.id != ''">
+					and g.id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and g.name like CONCAT('%','${params.name}','%' )  
+				</if>
+				<if test="params.remark != null and params.remark != ''">
+					and g.remark = #{params.remark}
+				</if>
+				<if test="params.level != null and params.level != ''">
+					and g.level = #{params.level}
+				</if>
+				<if test="params.memberCount != null and params.memberCount != ''">
+					and g.member_count = #{params.memberCount}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and g.create_time = #{params.createTime}
+				</if>
+				<if test="params.currency != null and params.currency != ''">
+					and g.currency = #{params.currency}
+				</if>
+				<if test="params.discountId != null and params.discountId != ''">
+					and g.discount_id = #{params.discountId}
+				</if>
+				<if test="params.slogan != null and params.slogan != ''">
+					and g.slogan = #{params.slogan}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and g.status = #{params.status}
+				</if>
+			</where>
+		ORDER BY level DESC 
+	</select>
+	
+	<resultMap id="guildResultMap" type="com.game.guild.domain.GuildInfo">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="icon" column="icon" />
+       	<result property="remark" column="remark" />
+        <result property="level" column="level" />
+        <result property="memberCount" column="member_count" />
+        <result property="createTime" column="create_time" />
+        <result property="currency" column="currency" />
+        <result property="discountId" column="discount_id" />
+        <result property="slogan" column="slogan" />
+        <result property="version" column="version" />
+        <result property="exp" column="exp" />
+        <result property="commend" column="commend" />
+        <result property="createUserId" column="create_user_id" />
+        <result property="status" column="status" />
+        <result property="joined" column="joined" />
+        <result property="levelName" column="level_name" />
+        <result property="userName" column="user_name" />
+        <result property="nickName" column="nick_name" />
+        <association property="guildLevel" javaType="com.game.guild.domain.GuildLevel">
+        	<id property="id" column="level_id" />
+        	<id property="name" column="level_name" />
+        	<id property="amount" column="level_amount" />
+        	<id property="level" column="level_level" />
+        	<id property="limitMemberQuantity" column="limit_member_quantity" />
+        	<id property="exp" column="level_exp" />
+        	<id property="isDefault" column="is_default" />
+        	<id property="remark" column="level_remark" />
+        </association>
+    </resultMap>
+	
+	<select id="select" resultMap="guildResultMap" parameterType="int">
+		SELECT 
+			g.id AS id, g.name AS name,icon, g.remark AS remark, g.level AS level, 
+			g.member_count AS member_count, g.create_time AS create_time, g.currency AS currency, 
+			g.discount_id AS discount_id, g.slogan AS slogan, g.version as version, g.exp as exp,
+			g.commend as commend, g.create_user_id as create_user_id, g.status as status,
+      		2 as joined,
+      		l.id as level_id, l.name as level_name, l.amount as level_amount, l.level as level_level,
+      		l.limit_member_quantity as limit_member_quantity, l.exp as level_exp, l.is_default as is_default, l.remark as level_remark,
+			u.user_name as user_name, u.nick_name as nick_name
+		FROM guild_info g left join guild_level l on g.level=l.id left join user u on g.create_user_id=u.id
+		WHERE g.id=#{id} and g.status='1'
+	</select>
+	<select id="selectByIds" resultType="com.game.guild.domain.GuildInfo" parameterType="map">
+	SELECT
+	  g.id,
+	  g.name,
+	  g.icon,
+	  g.remark,
+	  g.level,
+	  g.member_count,
+	  g.create_time,
+	  g.currency,
+	  g.discount_id,
+	  g.slogan,
+	  g.status,
+	  g.create_user_id,
+	  g.commend,
+	  lv.name as level_name,
+	  (CASE 
+       WHEN ISNULL(m.is_admin) or m.member_status is null THEN -1 
+       when m.member_status='0' then -2
+       ELSE m.is_admin END) AS joined
+	FROM guild_info g
+	  LEFT JOIN (SELECT
+	               guild_id, status as member_status, is_admin
+	             FROM guild_members
+	             WHERE user_id = #{userId}) m
+	    ON g.id = m.guild_id left join guild_level lv on g.level=lv.id
+		WHERE g.id in 
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		order by FIELD(g.id,
+		<foreach collection="array" item="item" open="" separator="," close="">
+			#{item}
+		</foreach>						
+			)
+	</select>
+	
+	<select id="selectCostTopQuantity" resultType="com.alibaba.fastjson.JSONObject" parameterType="int">
+		select 
+			g.id as id,
+			g.name as name,
+			g.icon as icon,
+		    g.member_count as memberCount,
+		    g.slogan as slogan,
+		    l.name as levelName,
+			case when sum(o.pay_amount) is null then 0 else sum(o.pay_amount) end as amount 
+		from guild_info g 
+    	left join guild_level l on g.level=l.id 
+    	left join user_order o on g.id=o.guild_id
+		where g.status='1'
+		group by g.id 
+		order by amount desc, g.id desc limit #{limit}
+	</select>
+	
+	<select id="selectByUser" resultMap="guildResultMap" parameterType="map">
+		SELECT
+		  g.id             AS id,
+		  g.name           AS NAME,
+		  g.icon,
+		  g.remark         AS remark,
+		  g.level          AS level,
+		  g.member_count   AS member_count,
+		  g.create_time    AS create_time,
+		  g.currency       AS currency,
+		  g.discount_id    AS discount_id,
+		  g.slogan         AS slogan,
+		  g.version,
+		  g.exp,
+		  g.commend,
+		  g.create_user_id,
+		  g.status,
+		  l.id as level_id, l.name as level_name, l.amount as level_amount, l.level as level_level,
+      	  l.limit_member_quantity as limit_member_quantity, l.exp as level_exp, l.is_default as is_default, l.remark as level_remark,
+		  u.user_name as user_name,
+      	  u.nick_name as nick_name,
+		  (CASE 
+		  WHEN s.is_admin IS NULL or s.member_status is null THEN -1
+		  when s.member_status='0' then -2
+		  ELSE s.is_admin END ) AS joined,
+		  j.joinCount
+		FROM guild_info g
+		  LEFT JOIN (SELECT
+		               guild_id, status as member_status,
+		               is_admin
+		             FROM guild_members
+		             WHERE user_id = #{userId}) s
+		    ON g.id = s.guild_id
+		  LEFT JOIN (SELECT
+		               guild_id,
+		               COUNT(DISTINCT user_id) AS joinCount
+		             FROM guild_members
+		             WHERE STATUS = 0
+		             GROUP BY guild_id) j
+		    ON g.id = j.guild_id left join user u on g.create_user_id=u.id left join guild_level l on g.level=l.id
+		WHERE g.id = #{guildId}
+		    AND g.status = '1'
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildInfo" parameterType="com.game.guild.domain.GuildInfo">
+		SELECT  id AS id, name AS name, remark AS remark, level AS level, member_count AS memberCount, create_time AS createTime, currency AS currency, discount_id AS discountId, slogan AS slogan FROM guild_info
+		<where>
+				status='1'
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="remark != null and remark != ''">
+					and remark = #{remark}
+				</if>
+				<if test="level != null and level != ''">
+					and level = #{level}
+				</if>
+				<if test="memberCount != null and memberCount != ''">
+					and member_count = #{memberCount}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="currency != null and currency != ''">
+					and currency = #{currency}
+				</if>
+				<if test="discountId != null and discountId != ''">
+					and discount_id = #{discountId}
+				</if>
+				<if test="slogan != null and slogan != ''">
+					and slogan = #{slogan}
+				</if>
+				<if test="createUserId != null and createUserId != ''">
+					and create_user_id = #{createUserId}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildInfo" parameterType="int">
+		SELECT  id AS id, name AS name,icon, remark AS remark, level AS level, member_count AS memberCount, create_time AS createTime, currency AS currency, discount_id AS discountId, slogan AS slogan FROM guild_info
+		where status='1'
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildInfo">
+		INSERT INTO guild_info
+		(
+		    name, remark, level, member_count, icon,create_time, currency, discount_id, slogan,create_user_id)
+		values 
+		(
+		    #{name} , #{remark} , #{level} ,#{memberCount} , #{icon},  #{createTime} , #{currency} , #{discountId} , #{slogan}, #{createUserId}  
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildInfo">
+		UPDATE guild_info 
+		SET  id=#{id} , name=#{name} , remark=#{remark} , level=#{level} , member_count=#{memberCount} , 
+		currency=#{currency} , discount_id=#{discountId} , slogan=#{slogan}, exp=#{exp} 
+		WHERE id=#{id}
+	</update>
+	
+	<update id="updateBalance" parameterType="com.game.guild.domain.GuildInfo">
+		UPDATE guild_info 
+		SET currency=#{currency} , version=version+1  where id=#{id} and version=#{version}
+	</update>
+	<update id="updateGuildDestroy" parameterType="int">
+		UPDATE guild_info SET status=0 where id=#{guildId}
+	</update>
+
+	<update id="updateGuildBuilding" parameterType="com.game.guild.domain.GuildInfo">
+		UPDATE guild_info 
+		SET name=#{name} , slogan=#{slogan},remark=#{remark} ,icon=#{icon} where id=#{id}
+	</update>	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_info WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_info WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<select id="selectByUserId" resultType="com.game.guild.domain.GuildInfo" parameterType="int">
+		SELECT
+		  g.id          AS id,
+		  g.name        AS NAME,
+		  g.icon        AS icon,
+		  g.level       AS LEVEL,
+      	  lv.name as level_name,
+		  g.currency    AS currency,
+		  g.create_time AS createTime,
+          g.member_count AS member_count,
+		  (CASE 
+		  WHEN u.is_admin IS NULL or u.status is null THEN -1 
+		  when u.status='0' then -2
+		  ELSE u.is_admin END ) AS joined,
+		  g.slogan      AS slogan,
+		  (case when j.join_count is null then 0 else j.join_count end) AS join_count,
+		  us.nick_name as userName
+		  FROM guild_info g 
+		  LEFT JOIN guild_level lv 
+		  	ON g.level=lv.id
+		  LEFT JOIN guild_members u 
+		  	ON g.id = u.guild_id
+		  LEFT JOIN (SELECT guild_id, COUNT(DISTINCT user_id) AS join_count FROM guild_members WHERE STATUS = 0 GROUP BY guild_id) j
+		    ON g.id = j.guild_id
+		  LEFT JOIN user us on g.create_user_id=us.id 
+		  WHERE u.user_id = #{userId} AND g.status = '1'
+	</select>
+	
+	<select id="selectRecommend" resultType="com.game.guild.domain.GuildInfo" parameterType="map">
+		SELECT
+		  g.id             AS id,
+		  g.name           AS name,
+		  g.icon           AS icon,
+		  g.level          AS level,
+		  g.currency       AS currency,
+		  g.create_time    AS createTime,
+		  g.slogan         AS slogan,
+		  g.member_count   AS memberCount,
+		  g.create_user_id,
+		  g.commend        AS commend,
+		  '-1'             AS joined,
+		  u.nick_name      AS userName
+		FROM guild_info g
+		  LEFT JOIN USER u
+		    ON g.create_user_id = u.id
+		WHERE g.status = '1'
+		ORDER BY commend DESC
+		LIMIT 9
+	</select>	
+	
+	<select id="selectCommend" resultType="com.game.guild.domain.GuildInfo" parameterType="java.lang.Integer">
+		SELECT
+		  g.id       AS id,
+		  g.name     AS NAME,
+		  g.icon     AS icon,
+		  g.level    AS LEVEL,
+		  g.currency AS currency,
+		  g.create_time AS createTime,
+		  g.slogan AS slogan,
+		  g.member_count AS memberCount
+		FROM guild_info g
+		 where status='1' and commend &gt;0 
+				and id not in
+				<foreach collection="array" item="ids" open="(" separator="," close=")">
+					#{ids}
+				</foreach>	 
+		 order by commend desc		
+	</select>
+	
+	<select id="selectRankings" resultType="com.game.guild.domain.GuildInfo" parameterType="java.lang.Integer">
+		SELECT
+		  g.id       AS id,
+		  g.name     AS NAME,
+		  g.icon     AS icon,
+		  g.level    AS LEVEL,
+		  g.currency AS currency,
+		  g.create_time AS createTime,
+		  g.slogan AS slogan,
+		  g.member_count AS memberCount,
+		  '0' as joined
+		FROM guild_info g where status='1'
+		 order by g.level desc limit #{limit}
+	</select>
+	
+	<select id="selectRankingsByUser" resultType="com.game.guild.domain.GuildInfo" parameterType="map">
+		SELECT
+		  g.id           AS id,
+		  g.name         AS NAME,
+		  g.icon         AS icon,
+		  g.level        AS LEVEL,
+		  g.currency     AS currency,
+		  g.create_time  AS createTime,
+		  g.slogan       AS slogan,
+		  g.member_count AS memberCount,
+		  lv.name as level_name,
+		  (CASE 
+		  WHEN m.is_admin IS NULL or m.status is null THEN -1 
+		  when m.status='0' then -2
+		  ELSE m.is_admin END) AS joined
+		FROM guild_info g
+		  LEFT JOIN guild_members m
+		    ON g.id = m.guild_id
+		      AND m.user_id = #{userId} left join guild_level lv on g.level=lv.id
+		WHERE g.status = '1'
+		ORDER BY g.level DESC, g.exp DESC
+		limit #{limit}
+	</select>
+	
+	<insert id="insertJoinGames" keyProperty="id" useGeneratedKeys="true" parameterType="map">
+		INSERT INTO ref_guild_game
+		(
+		    guild_id, game_code
+		)
+		values 
+		(
+		    #{guildId} , #{gameCode}
+		)
+	</insert>
+	<delete id="deleteJoinGames" parameterType="map">
+		<![CDATA[
+			DELETE FROM ref_guild_game WHERE guild_id=#{guildId} and game_code=#{gameCode}
+		]]>
+	</delete>
+	
+</mapper>

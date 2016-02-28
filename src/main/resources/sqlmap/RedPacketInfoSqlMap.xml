@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.RedPacketInfoDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		name,
+		total_money,
+		total_people,
+		user_id,
+		guild_id,
+		left_money,
+		left_people,
+		create_time,
+		version
+		 FROM red_packet_info
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.RedPacketInfo" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and name = #{params.name}
+				</if>
+				<if test="params.totalMoney != null and params.totalMoney != ''">
+					and total_money = #{params.totalMoney}
+				</if>
+				<if test="params.totalPeople != null and params.totalPeople != ''">
+					and total_people = #{params.totalPeople}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.guildId != null and params.guildId != ''">
+					and guild_id = #{params.guildId}
+				</if>
+				<if test="params.leftMoney != null and params.leftMoney != ''">
+					and left_money = #{params.leftMoney}
+				</if>
+				<if test="params.leftPeople != null and params.leftPeople != ''">
+					and left_people = #{params.leftPeople}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.RedPacketInfo" parameterType="int">
+		SELECT  id, name, total_money, total_people, user_id, guild_id, left_money, left_people, create_time,version FROM red_packet_info WHERE id=#{id} and left_people &gt;0
+	</select>
+	
+	<select id="selectGuildLimit" resultType="com.game.guild.domain.RedPacketInfo" parameterType="map">
+		SELECT
+		  i.id,
+		  i.name,
+		  i.total_money,
+		  i.total_people,
+		  i.user_id,
+		  i.guild_id,
+		  i.left_money,
+		  i.left_people,
+		  i.create_time,
+		  i.version
+		FROM red_packet_info i
+		WHERE i.guild_id = #{guildId}
+		    AND i.id NOT IN(SELECT
+		                      packet_id
+		                    FROM red_packet_item
+		                    WHERE user_id = #{userId})
+		                    AND i.left_people&gt;0
+		LIMIT 1
+	</select>
+	<select id="selectByEntity" resultType="com.game.guild.domain.RedPacketInfo" parameterType="com.game.guild.domain.RedPacketInfo">
+		SELECT  id, name, total_money, total_people, user_id, guild_id, left_money, left_people, create_time,version FROM red_packet_info
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="totalMoney != null and totalMoney != ''">
+					and total_money = #{totalMoney}
+				</if>
+				<if test="totalPeople != null and totalPeople != ''">
+					and total_people = #{totalPeople}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="guildId != null and guildId != ''">
+					and guild_id = #{guildId}
+				</if>
+				<if test="leftMoney != null and leftMoney != ''">
+					and left_money = #{leftMoney}
+				</if>
+				<if test="leftPeople != null and leftPeople != ''">
+					and left_people = #{leftPeople}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.RedPacketInfo" parameterType="int">
+		SELECT  id, name, total_money, total_people, user_id, guild_id, left_money, left_people, create_time,version FROM red_packet_info
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.RedPacketInfo">
+		INSERT INTO red_packet_info
+		(
+		    name, total_money, total_people, user_id, guild_id, left_money, left_people, create_time)
+		values 
+		(
+		    #{name} , #{totalMoney} , #{totalPeople}, #{userId} , #{guildId} , #{totalMoney} , #{totalPeople}, #{createTime} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.RedPacketInfo">
+		UPDATE red_packet_info 
+		SET  id=#{id} , name=#{name} , total_money=#{totalMoney} , total_people=#{totalPeople} , user_id=#{userId} , guild_id=#{guildId} , left_money=#{leftMoney} , left_people=#{leftPeople} , create_time=#{createTime},version=version+1  WHERE id=#{id} and version=#{version} and left_people &gt;0
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM red_packet_info WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM red_packet_info WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.PlatformBlockCommentDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id AS id,
+		name AS name,
+		block_id AS blockId,
+		business_ids AS businessIds,
+		hand_edit AS handEdit FROM platform_block_comment
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.platform.domain.PlatformBlockComment" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and name = #{params.name}
+				</if>
+				<if test="params.blockId != null and params.blockId != ''">
+					and block_id = #{params.blockId}
+				</if>
+				<if test="params.businessIds != null and params.businessIds != ''">
+					and business_ids = #{params.businessIds}
+				</if>
+				<if test="params.handEdit != null and params.handEdit != ''">
+					and hand_edit = #{params.handEdit}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.platform.domain.PlatformBlockComment" parameterType="int">
+		SELECT  id AS id, name AS name, block_id AS blockId, business_ids AS businessIds, hand_edit AS handEdit FROM platform_block_comment WHERE id=#{id}
+	</select>
+	
+	<select id="selectByBlock" resultType="com.game.platform.domain.PlatformBlockComment" parameterType="string">
+		SELECT id AS id, name AS name, block_id AS blockId, business_ids AS businessIds, hand_edit AS handEdit FROM platform_block_comment WHERE block_id=#{blockId}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.platform.domain.PlatformBlockComment" parameterType="com.game.platform.domain.PlatformBlockComment">
+		SELECT  id AS id, name AS name, block_id AS blockId, business_ids AS businessIds, hand_edit AS handEdit FROM platform_block_comment
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="blockId != null and blockId != ''">
+					and block_id = #{blockId}
+				</if>
+				<if test="businessIds != null and businessIds != ''">
+					and business_ids = #{businessIds}
+				</if>
+				<if test="handEdit != null and handEdit != ''">
+					and hand_edit = #{handEdit}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.PlatformBlockComment" parameterType="int">
+		SELECT  id AS id, name AS name, block_id AS blockId, business_ids AS businessIds, hand_edit AS handEdit FROM platform_block_comment
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.PlatformBlockComment">
+		INSERT INTO platform_block_comment
+		(
+		    name, block_id, business_ids, hand_edit)
+		values 
+		(
+		    #{name} , #{blockId} , #{businessIds} , #{handEdit} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.PlatformBlockComment">
+		UPDATE platform_block_comment 
+		SET  id=#{id} , name=#{name} , block_id=#{blockId} , business_ids=#{businessIds} , hand_edit=#{handEdit}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM platform_block_comment WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM platform_block_comment WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

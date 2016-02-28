@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.payment.persistence.dao.ChargeDao">
+
+	<!--■■■■■■■■■■■■■■■■■■■■使用Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	
+	<sql id="commonSelect">
+		select 
+			id as orderId, amount, deal_date as chargeDate, card_no as cardNo, 
+			channel_id as channelId, create_date as createDate, payment_id as paymentId,
+			status_message as message, status as payStatus
+		from MERCHANT_ORDER_INFO
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.payment.domain.UserCharge" useCache="false">
+		<include refid="commonSelect"/>
+		<where>
+			<if test="params.userName != null and params.userName != ''">
+				and userName = #{params.userName}
+			</if>
+			<if test="params.status!=null and params.status==1">
+				and status=1
+			</if>
+			<if test="params.status!=null and params.status==2">
+				and (status=0 or status=2)
+			</if>
+		</where>
+		order by create_date desc
+	</select>
+
+	<insert id="insertAndReturnOrderId" parameterType="com.game.payment.domain.OrderInfo" keyProperty="id">
+		insert into MERCHANT_ORDER_INFO (
+			ID,CHANNEL_ORDERID,MERCHANT_ID,MERCHANT_VERSION,MERCHANT_ORDERID,
+			MERCHANT_ORDERDATE,MERCHANT_PRODUCTNAME,ORDER_AMOUNT,AMOUNT,STATUS,STATUS_CODE,CREATE_DATE,
+			DEAL_DATE,PAY_ORDERID,PAY_STATUS,PAY_STATUSCODE,NOTIFY_STATUS,NOTIFY_URL,RETURN_URL,CARD_NO,
+			CARD_PWD,PARAMETER1,APP_CHANNELID,NOTIFY_TIMES,NOTIFY_DATE,PAYMENT_ID,CHANNEL_ID,SOURCE_TYPE,MEMO,
+			PAY_ID,NNUID,USERNAME,USERREGTIME,ROLEID,ROLENAME,CLIENTTYPE,CLIENTOSTYPE,CLIENTOSVERSION,
+			AP,IMEI,MAC,PHONETYPE,APPID,SERVERID,STATUS_MESSAGE,THIRD_UID) 
+		values (
+			#{orderId}, #{channelOrderid}, #{merchantId}, #{merchantVersion}, #{merchantOrderid},
+			#{merchantOrderdate}, #{merchantProductname}, #{orderAmount}, #{amount}, #{status},
+			#{statusCode}, #{createDate}, #{dealDate}, #{payOrderid}, #{payStatus}, #{payStatuscode},
+			#{notifyStatus}, #{notifyUrl}, #{returnUrl}, #{cardNo}, #{cardPwd}, #{parameter1}, #{appChannelId},
+			#{notifyTimes}, #{notifyDate}, #{paymentId}, #{channelId}, #{sourceType}, #{memo}, #{payId},
+			#{nnuid}, #{username}, #{userregtime}, #{roleid}, #{rolename}, #{clienttype}, #{clientostype},
+			#{clientosversion}, #{ap}, #{imei}, #{mac}, #{phonetype}, #{appid}, #{serverid}, #{statusMessage}, #{thirdUid}
+		)
+	</insert>
+	
+	<update id="updateOrderInfo" parameterType="Map" flushCache="true">
+			update MERCHANT_ORDER_INFO set NOTIFY_STATUS = '1' where id =#{orderId}
+	</update>
+</mapper>

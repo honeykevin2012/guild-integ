@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.RedPacketItemDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		packet_id,
+		money,
+		user_id,
+		create_time,
+		receive_time FROM red_packet_item
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.RedPacketItem" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.packetId != null and params.packetId != ''">
+					and packet_id = #{params.packetId}
+				</if>
+				<if test="params.money != null and params.money != ''">
+					and money = #{params.money}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+				<if test="params.receiveTime != null and params.receiveTime != ''">
+					and receive_time = #{params.receiveTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.RedPacketItem" parameterType="int">
+		SELECT  id, packet_id, money, user_id, create_time, receive_time FROM red_packet_item WHERE id=#{id}
+	</select>
+
+	<select id="selectOne" resultType="com.game.guild.domain.RedPacketItem" parameterType="int">
+		SELECT
+		  id,
+		  packet_id,
+		  money,
+		  user_id,
+		  create_time,
+		  receive_time
+		FROM red_packet_item
+		WHERE packet_id =  #{packetId}
+		    AND user_id IS NULL
+		ORDER BY RAND()
+		LIMIT 1
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.RedPacketItem" parameterType="com.game.guild.domain.RedPacketItem">
+		SELECT  id, packet_id, money, user_id, create_time, receive_time FROM red_packet_item
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="packetId != null and packetId != ''">
+					and packet_id = #{packetId}
+				</if>
+				<if test="money != null and money != ''">
+					and money = #{money}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="receiveTime != null and receiveTime != ''">
+					and receive_time = #{receiveTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.RedPacketItem" parameterType="int">
+		SELECT  id, packet_id, money, user_id, create_time, receive_time FROM red_packet_item
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.RedPacketItem">
+		INSERT INTO red_packet_item
+		(
+		    packet_id, money, user_id, create_time, receive_time)
+		values 
+		(
+		    #{packetId} , #{money} , #{userId} , #{createTime} , #{receiveTime} 
+		)
+	</insert>
+
+	<insert id="insertRedPacketItem" useGeneratedKeys="true" parameterType="java.util.List">
+		INSERT INTO red_packet_item
+		(
+		    packet_id, money)
+		values 
+		  <foreach collection="list" item="item" index="index"
+		  separator=",">
+		  ( #{item.packetId}, #{item.money})
+		  </foreach>		
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.RedPacketItem">
+		UPDATE red_packet_item 
+		SET  id=#{id} , packet_id=#{packetId} , money=#{money} , user_id=#{userId} , create_time=#{createTime} , receive_time=#{receiveTime}  WHERE id=#{id} and user_id is null
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM red_packet_item WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM red_packet_item WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

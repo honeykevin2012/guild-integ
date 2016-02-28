@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildLevelDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 	
+			id,
+			name,
+			remark,
+			level,
+			exp 
+		FROM guild_level
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildLevel" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and name = #{params.name}
+				</if>
+				<if test="params.remark != null and params.remark != ''">
+					and remark = #{params.remark}
+				</if>
+				<if test="params.level != null and params.level != ''">
+					and level = #{params.level}
+				</if>
+				<if test="params.exp != null and params.exp != ''">
+					and exp = #{params.exp}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildLevel" parameterType="int">
+		SELECT  id, name, remark, level, exp FROM guild_level WHERE id=#{id}
+	</select>
+	<select id="selectDefaultLevel" resultType="com.game.guild.domain.GuildLevel" parameterType="int">
+		SELECT  id, name, remark, level, is_default, amount FROM guild_level WHERE is_default=1
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildLevel" parameterType="com.game.guild.domain.GuildLevel">
+		SELECT  id, name, remark, level, exp FROM guild_level
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="remark != null and remark != ''">
+					and remark = #{remark}
+				</if>
+				<if test="level != null and level != ''">
+					and level = #{level}
+				</if>
+				<if test="exp != null and exp != ''">
+					and exp = #{exp}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildLevel" parameterType="int">
+		SELECT  id, name, remark, level, exp FROM guild_level
+	</select>
+	
+	<select id="selectCurrentLevel" resultType="com.game.guild.domain.GuildLevel" parameterType="int">
+		<![CDATA[
+			select * from guild_level where amount = (select max(amount) as point from guild_level where amount <= #{amount})
+		]]>
+	</select>
+	
+	<select id="selectNextLevel" resultType="com.game.guild.domain.GuildLevel" parameterType="int">
+		SELECT  id, name, remark, level, exp, amount, limit_member_quantity, is_default FROM guild_level where amount >= #{amount} order by exp asc limit 1
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildLevel">
+		INSERT INTO guild_level
+		(
+		    name, remark, level, exp)
+		values 
+		(
+		    #{name} , #{remark} , #{level} , #{exp} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildLevel">
+		UPDATE guild_level 
+		SET  id=#{id} , name=#{name} , remark=#{remark} , level=#{level} , exp=#{exp}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_level WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_level WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

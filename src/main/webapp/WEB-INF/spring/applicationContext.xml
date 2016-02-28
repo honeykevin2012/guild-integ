@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+ 	http://www.springframework.org/schema/cache
+ 	http://www.springframework.org/schema/cache/spring-cache.xsd
+ 	http://www.springframework.org/schema/aop
+ 	http://www.springframework.org/schema/aop/spring-aop.xsd">
+ 	<context:component-scan base-package="com.game.init" />
+ 	<context:component-scan base-package="com.game.payment"> 
+	  	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan> 
+	<context:component-scan base-package="com.game.platform"> 
+	  	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan> 
+	<context:component-scan base-package="com.game.guild"> 
+	  	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan> 
+	<context:component-scan base-package="com.game.shop"> 
+	  	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan>
+	<context:component-scan base-package="com.game.user"> 
+	  	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
+	</context:component-scan>
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  		<property name="locations">
+  			<list>
+   				<value>classpath:db.properties</value>
+   				<value>classpath:config.properties</value>
+   				<value>classpath:couchbase.properties</value>
+   				<value>classpath:mongo.properties</value>
+   			</list>
+  		</property>
+  		<property name="fileEncoding" value="utf-8"/>
+ 	</bean>
+ 	
+	<!-- 主数据源 采用DRUID连接池-->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+   		<property name="driverClassName" value="${db.driverClass}" />
+   		<property name="url" value="${db.master.url}" />
+   		<property name="username" value="${db.master.username}" />
+   		<property name="password" value="${db.master.password}" />
+     
+	    <property name="filters" value="stat" />
+	    
+	    <!-- 配置初始化大小、最小、最大 -->
+	    <property name="initialSize" value="${db.initialSize}" />
+	    <property name="minIdle" value="${db.minIdle}" />
+	    <property name="maxActive" value="${db.maxActive}" />
+	    
+	    <!-- 获取连接等待超时的时间 -->
+	    <property name="maxWait" value="${db.maxWait}" />
+	    <!-- 间隔多久进行一次检测，检测需要关闭的空闲连接，60秒 -->
+	    <property name="timeBetweenEvictionRunsMillis" value="${db.timeBetweenEvictionRunsMillis}" />
+	    <!-- 一个连接在池中最小生存的时间，300秒 -->
+	    <property name="minEvictableIdleTimeMillis" value="${db.minEvictableIdleTimeMillis}" />
+	    
+	    <property name="validationQuery" value="SELECT 'x'" />
+	    <property name="testWhileIdle" value="true" />
+	    <property name="testOnBorrow" value="false" />
+	    <property name="testOnReturn" value="false" />
+    	<property name="removeAbandoned" value="true" />   
+        <property name="removeAbandonedTimeout" value="${db.removeAbandonedTimeout}" />
+        <property name="poolPreparedStatements" value="false" />
+        <!-- <property name="maxPoolPreparedStatementPerConnectionSize" value="${db.maxPoolPreparedStatementPerConnectionSize}" /> -->
+	</bean>
+	
+	<!-- Mybatis定义 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  		<property name="dataSource" ref="dataSource" />
+  		<property name="configLocation" value="/WEB-INF/mybatis/configuration.xml" />
+ 	</bean>
+  	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+  		<constructor-arg index="0" ref="sqlSessionFactory" />
+ 	</bean>
+    
+    <bean id="applicationLoader" class="com.game.common.basics.ApplicationContextLoader"/>
+    
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">     
+          <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"></property>  
+    </bean>
+    
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!--
+    <bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache.xml" />
+		<property name="shared" value="true" />
+	</bean>
+ 	
+	<bean id="cacheManager" class="com.game.common.basics.cache.CacheableCouchBaseManager">
+		<property name="client" ref="memcachedClient" />
+		<property name="caches">  
+	        <set>  
+	            <bean class="com.game.common.basics.cache.CacheableCouchBase">  
+	                <property name="name" value="testCache"/>  
+	                <property name="cache" ref="memcachedClient"/>  
+	            </bean>  
+	        </set>  
+    	</property>  
+	</bean>
+    -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    	<tx:attributes>
+    		<tx:method name="insert*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+    		<tx:method name="save*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+    		<tx:method name="add*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+      		<tx:method name="delete*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />  		
+		   	<tx:method name="modify*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		   	<tx:method name="edit*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		    <tx:method name="update*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		    <tx:method name="create*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		    <tx:method name="persist*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		    <tx:method name="creator*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		   	<tx:method name="editor*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+		   	<tx:method name="find*" read-only="true"/>
+		   	<tx:method name="get*" read-only="true"/>
+		   	<tx:method name="select*" read-only="true"/>
+		   	<tx:method name="query*" read-only="true"/>
+    	</tx:attributes>
+    </tx:advice>
+    
+    
+    <aop:config>    
+	   <aop:pointcut id="servicePointCut" expression="(execution(* com.game.user.persistence.service.*.*(..)))
+	   or (execution(* com.game.shop.persistence.service.*.*(..)))
+	   or (execution(* com.game.platform.persistence.service.*.*(..)))
+	   or (execution(* com.game.payment.persistence.service.*.*(..)))
+	   or (execution(* com.game.guild.persistence.service.*.*(..)))"/> 
+	   <aop:advisor pointcut-ref="servicePointCut" advice-ref="txAdvice"/>
+    </aop:config>
+    
+    <bean id="cacheAdvice" class="com.game.common.basics.aop.MemcachedCacheInterceptor"></bean>
+    <aop:config>
+        <aop:aspect ref="cacheAdvice">
+            <aop:pointcut id="cacheGetPointCut" expression="
+            	  (execution(* com.game.user.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.LoadFromMemcached))
+			   or (execution(* com.game.shop.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.LoadFromMemcached))
+			   or (execution(* com.game.platform.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.LoadFromMemcached))
+			   or (execution(* com.game.payment.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.LoadFromMemcached))
+			   or (execution(* com.game.guild.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.LoadFromMemcached))"/> 
+            <aop:around method="get" pointcut-ref="cacheGetPointCut"/>
+            
+            <aop:pointcut id="cacheUpdatePointCut" expression="
+                  (execution(* com.game.user.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.UpdateForMemcached))
+			   or (execution(* com.game.shop.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.UpdateForMemcached))
+			   or (execution(* com.game.platform.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.UpdateForMemcached))
+			   or (execution(* com.game.payment.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.UpdateForMemcached))
+			   or (execution(* com.game.guild.persistence.service.*.*(..)) and @annotation(com.game.common.basics.aop.UpdateForMemcached))"/> 
+            <aop:around method="update" pointcut-ref="cacheUpdatePointCut"/>
+        </aop:aspect>
+    </aop:config>
+	
+	<bean id="threadPoolTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+
+		<!-- 核心线程数，默认为1 -->
+		<property name="corePoolSize" value="5" />
+
+		<!-- 最大线程数，默认为Integer.MAX_VALUE -->
+		<property name="maxPoolSize" value="10" />
+
+		<!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
+		<property name="queueCapacity" value="10" /> 
+
+		<!-- 线程池维护线程所允许的空闲时间，默认为60s -->
+		<property name="keepAliveSeconds" value="300" />
+
+		<!-- 线程池对拒绝任务（无线程可用）的处理策略，目前只支持AbortPolicy、CallerRunsPolicy；默认为后者 -->
+		<property name="rejectedExecutionHandler">
+			<!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常 -->
+			<!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度 -->
+			<!-- DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->
+			<!-- DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+	</bean>
+	
+	<!-- 启用缓存注解功能，这个是必须的，否则注解不会生效，另外，该注解一定要声明在spring主配置文件中才会生效 -->
+	<cache:annotation-driven cache-manager="cacheManager" />
+	
+	<!-- spring自己的换管理器，这里定义了两个缓存位置名称 ，既注解中的value -->
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+			<set>
+				<bean class="com.game.common.basics.cache.MemcachedCache">
+					<property name="cache" ref="defaultCache"/>
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<!-- memcached client defaultCache -->
+	<bean name="defaultCache" class="com.google.code.ssm.CacheFactory">
+		<property name="cacheClientFactory">
+			<bean class="com.google.code.ssm.providers.xmemcached.MemcacheClientFactoryImpl" />
+		</property>
+		<property name="addressProvider">
+			<bean class="com.google.code.ssm.config.DefaultAddressProvider">
+				<property name="address" value="123.59.134.15:11211" />
+			</bean>
+		</property>
+		<property name="configuration">
+			<bean class="com.google.code.ssm.providers.CacheConfiguration">
+				<property name="consistentHashing" value="true" />
+			</bean>
+		</property>
+		<property name="cacheName" value="default"/>
+	</bean>
+	
+	<!-- 
+	<import resource="classpath:config/mongo.xml"/>
+	-->
+</beans>

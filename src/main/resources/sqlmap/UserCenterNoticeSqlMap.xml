@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserCenterNoticeDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		type,
+		user_id,
+		content FROM user_center_notice
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserCenterNotice" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and type = #{params.type}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and content = #{params.content}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserCenterNotice" parameterType="int">
+		SELECT  id, type, user_id, content FROM user_center_notice WHERE id=#{id}
+	</select>
+	<select id="selectByUserId" resultType="com.game.user.domain.UserCenterNotice" parameterType="int">
+		SELECT  id, type, user_id, content FROM user_center_notice WHERE user_id=#{id} order by create_time desc limit 5
+	</select>	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserCenterNotice" parameterType="com.game.user.domain.UserCenterNotice">
+		SELECT  id, type, user_id, content FROM user_center_notice
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="type != null and type != ''">
+					and type = #{type}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="content != null and content != ''">
+					and content = #{content}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserCenterNotice" parameterType="int">
+		SELECT  id, type, user_id, content FROM user_center_notice
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserCenterNotice">
+		INSERT INTO user_center_notice
+		(
+		    type, user_id, content)
+		values 
+		(
+		    #{type} , #{userId} , #{content} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserCenterNotice">
+		UPDATE user_center_notice 
+		SET  id=#{id} , type=#{type} , user_id=#{userId} , content=#{content}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_center_notice WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_center_notice WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

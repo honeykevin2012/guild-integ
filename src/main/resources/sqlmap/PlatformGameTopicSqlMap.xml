@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.PlatformGameTopicDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT
+		  t.id,
+		  t.game_code,
+		  t.title,
+		  t.content,
+		  t.is_top,
+		  p.name      AS gameName,
+		  p.icon
+		FROM platform_game_topic t
+		  LEFT JOIN platform_game_app p
+		    ON t.game_code = p.code
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.platform.domain.PlatformGameTopic" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and t.id = #{params.id}
+				</if>
+				<if test="params.gameCode != null and params.gameCode != ''">
+					and t.game_code = #{params.gameCode}
+				</if>
+				<if test="params.title != null and params.title != ''">
+					and t.title = #{params.title}
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and t.content = #{params.content}
+				</if>
+				<if test="params.isTop != null and params.isTop != ''">
+					and t.is_top = #{params.isTop}
+				</if>
+			</where>
+		ORDER BY t.id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.platform.domain.PlatformGameTopic" parameterType="int">
+		SELECT
+		  t.id,
+		  t.game_code,
+		  t.title,
+		  t.content,
+		  t.is_top,
+		  p.name      AS gameName,
+		  p.icon
+		FROM platform_game_topic t
+		  LEFT JOIN platform_game_app p
+		    ON t.game_code = p.code WHERE t.id=#{id}
+	</select>
+
+	<select id="selectAppIndexList" resultType="com.game.platform.domain.PlatformGameTopic" parameterType="int">
+		SELECT
+		  t.id,
+		  t.game_code,
+		  t.title,
+		  t.content,
+		  t.is_top,
+		  p.name      AS gameName,
+		  p.icon
+		FROM platform_game_topic t
+		  LEFT JOIN platform_game_app p
+		    ON t.game_code = p.code
+		    WHERE t.game_code=#{gameCode} ORDER BY t.is_top DESC, t.create_time DESC 
+	</select>
+	
+	<select id="selectAppIndexAll" resultType="com.game.platform.domain.PlatformGameTopic" parameterType="int">
+		SELECT
+		  t.id,
+		  t.game_code,
+		  t.title,
+		  t.content,
+		  t.is_top,
+		  p.name      AS gameName,
+		  p.icon
+		FROM platform_game_topic t
+		  LEFT JOIN platform_game_app p
+		    ON t.game_code = p.code
+		     ORDER BY t.is_top DESC, t.create_time DESC limit 5 
+	</select>
+		
+	<select id="selectByEntity" resultType="com.game.platform.domain.PlatformGameTopic" parameterType="com.game.platform.domain.PlatformGameTopic">
+		SELECT
+		  t.id,
+		  t.game_code,
+		  t.title,
+		  t.url,
+		  t.content,
+		  t.is_top,
+		  p.name      AS gameName,
+		  p.icon
+		FROM platform_game_topic t
+		  LEFT JOIN platform_game_app p
+		    ON t.game_code = p.code
+		<where>
+				<if test="id != null and id != ''">
+					and t.id = #{id}
+				</if>
+				<if test="gameCode != null and gameCode != ''">
+					and t.game_code = #{gameCode}
+				</if>
+				<if test="title != null and title != ''">
+					and t.title = #{title}
+				</if>
+				<if test="content != null and content != ''">
+					and t.content = #{content}
+				</if>
+				<if test="isTop != null and isTop != ''">
+					and t.is_top = #{isTop}
+				</if>
+			</where>
+		ORDER BY t.id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.PlatformGameTopic" parameterType="int">
+		SELECT  id, game_code, title, content, is_top FROM platform_game_topic
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.PlatformGameTopic">
+		INSERT INTO platform_game_topic
+		(
+		    game_code, title, content)
+		values 
+		(
+		    #{gameCode} , #{title} , #{content} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.PlatformGameTopic">
+		UPDATE platform_game_topic 
+		SET  id=#{id} , game_code=#{gameCode} , title=#{title} , content=#{content}  WHERE id=#{id}
+	</update>
+	<update id="updateByGameCode" parameterType="com.game.platform.domain.PlatformGameTopic">
+		UPDATE platform_game_topic 
+		SET  is_top=#{isTop}  WHERE game_code=#{gameCode}
+	</update>
+	<update id="updateById" parameterType="com.game.platform.domain.PlatformGameTopic">
+		UPDATE platform_game_topic 
+		SET  is_top=#{isTop}  WHERE id=#{id}
+	</update>	
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM platform_game_topic WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM platform_game_topic WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

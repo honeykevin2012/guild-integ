@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.shop.persistence.dao.RefProductPromotionDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id AS id,
+		promotion_id AS promotionId,
+		business_id AS businessId,
+		group_id AS groupId,
+		group_level AS groupLevel,
+		type_flag AS typeFlag FROM ref_product_promotion
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.shop.domain.RefProductPromotion" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.promotionId != null and params.promotionId != ''">
+					and promotion_id = #{params.promotionId}
+				</if>
+				<if test="params.businessId != null and params.businessId != ''">
+					and business_id = #{params.businessId}
+				</if>
+				<if test="params.groupId != null and params.groupId != ''">
+					and group_id = #{params.groupId}
+				</if>
+				<if test="params.groupLevel != null and params.groupLevel != ''">
+					and group_level = #{params.groupLevel}
+				</if>
+				<if test="params.typeFlag != null and params.typeFlag != ''">
+					and type_flag = #{params.typeFlag}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.shop.domain.RefProductPromotion" parameterType="int">
+		SELECT  id AS id, promotion_id AS promotionId, business_id AS businessId, group_id AS groupId, group_level AS groupLevel, type_flag AS typeFlag FROM ref_product_promotion WHERE id=#{id}
+	</select>
+	
+	<select id="selectPromotionByProductId" resultType="com.game.shop.domain.RefProductPromotion" parameterType="java.lang.Integer">
+		SELECT 
+	    	r.id AS id,
+			r.promotion_id AS promotionId,
+			r.business_id AS businessId,
+			r.group_id AS groupId,
+			r.group_level AS groupLevel,
+		  	r.type_flag AS typeFlag,
+		    pp.name as promotionName,
+		    pp.id as promotionId,
+		    pp.conditions as conditions,
+		    uvg.name as groupName
+	    FROM ref_product_promotion r 
+	    left join product_promotion pp on r.promotion_id=pp.id 
+	    LEFT join user_vip_group uvg on r.group_id=uvg.id 
+	    where r.business_id=#{productId} and type_flag=1
+	</select>
+	
+	<select id="selectPromotionByUserAndProduct" resultType="com.game.shop.domain.RefProductPromotion" parameterType="map">
+		<![CDATA[
+			select * from
+	     		(SELECT 
+	        		r.id AS id,
+	    			r.promotion_id AS promotion_id,
+	    			r.business_id AS business_id,
+	    			r.group_id AS group_id,
+	  			  	r.group_level AS group_level,
+		  		  	r.type_flag AS type_flag,
+		  		    pp.name as promotionName,
+		  		    pp.id as promotionId,
+		  		    pp.conditions as conditions,
+		         	pp.type as type,
+		         	prod.price as price
+	     		FROM ref_product_promotion r, product_promotion pp, product_info prod
+	     		where r.promotion_id=pp.id and r.business_id=prod.id and r.type_flag=1 and pp.type=1 and r.group_level <=#{groupLevel} and r.business_id=#{productId}
+		     	)t
+		     LEFT join user_vip_group uvg on t.group_id=uvg.id 
+		     order by group_level desc
+		]]>
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.shop.domain.RefProductPromotion" parameterType="com.game.shop.domain.RefProductPromotion">
+		SELECT  id AS id, promotion_id AS promotionId, business_id AS businessId, group_id AS groupId, group_level AS groupLevel, type_flag AS typeFlag FROM ref_product_promotion
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="promotionId != null and promotionId != ''">
+					and promotion_id = #{promotionId}
+				</if>
+				<if test="businessId != null and businessId != ''">
+					and business_id = #{businessId}
+				</if>
+				<if test="groupId != null and groupId != ''">
+					and group_id = #{groupId}
+				</if>
+				<if test="groupLevel != null and groupLevel != ''">
+					and group_level = #{groupLevel}
+				</if>
+				<if test="typeFlag != null and typeFlag != ''">
+					and type_flag = #{typeFlag}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.shop.domain.RefProductPromotion" parameterType="int">
+		SELECT  id AS id, promotion_id AS promotionId, business_id AS businessId, group_id AS groupId, group_level AS groupLevel, type_flag AS typeFlag FROM ref_product_promotion
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.shop.domain.RefProductPromotion">
+		INSERT INTO ref_product_promotion
+		(
+		    promotion_id, business_id, group_id, group_level, type_flag)
+		values 
+		(
+		    #{promotionId} , #{businessId} , #{groupId} , #{groupLevel} , #{typeFlag} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.shop.domain.RefProductPromotion">
+		UPDATE ref_product_promotion 
+		SET  id=#{id} , promotion_id=#{promotionId} , business_id=#{businessId} , group_id=#{groupId} , group_level=#{groupLevel} , type_flag=#{typeFlag}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM ref_product_promotion WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM ref_product_promotion WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<delete id="deleteByEntity" parameterType="com.game.shop.domain.RefProductPromotion">
+       	DELETE FROM ref_product_promotion WHERE business_id=#{businessId} and group_id=#{groupId} and promotion_id=#{promotionId} and type_flag=#{typeFlag}
+	</delete>
+</mapper>

@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildMembersDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 
+			m.id,
+			m.user_id,
+			m.guild_id,
+			m.level,
+			m.join_time,
+			m.apply_time,
+			m.exp,
+			m.point,
+			m.status,
+			g.name as guild_name,
+			u.user_name,
+			u.nick_name
+		FROM guild_members m 
+		left join guild_info g on m.guild_id=g.id and g.status='1'
+		left join user u on m.user_id=u.id
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildMembers" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and m.id = #{params.id}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and m.user_id = #{params.userId}
+				</if>
+				<if test="params.guildId != null and params.guildId != ''">
+					and m.guild_id = #{params.guildId}
+				</if>
+				<if test="params.level != null and params.level != ''">
+					and m.level = #{params.level}
+				</if>
+				<if test="params.joinTime != null and params.joinTime != ''">
+					and m.join_time = #{params.joinTime}
+				</if>
+				<if test="params.applyTime != null and params.applyTime != ''">
+					and m.apply_time = #{params.applyTime}
+				</if>
+				<if test="params.exp != null and params.exp != ''">
+					and m.exp = #{params.exp}
+				</if>
+				<if test="params.point != null and params.point != ''">
+					and m.point = #{params.point}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and m.status = #{params.status}
+				</if>
+			</where>
+		ORDER BY m.id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildMembers" parameterType="int">
+		SELECT  id, user_id, guild_id, level, join_time, apply_time, exp, point, status FROM guild_members WHERE id=#{id}
+	</select>
+	
+	<select id="selectByUserIds" resultType="com.game.guild.domain.GuildMembers" parameterType="int">
+		SELECT  id, user_id, guild_id, level, join_time, apply_time, exp, point, status FROM guild_members 
+		WHERE id in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</select>
+	
+	<select id="selectByUserAndGuildId" resultType="com.game.guild.domain.GuildMembers" parameterType="map">
+		SELECT
+		  m.id,
+		  m.user_id,
+		  m.guild_id,
+		  m.level,
+		  m.join_time,
+		  m.apply_time,
+		  m.exp,
+		  m.point,
+		  m.is_admin,
+		  m.status,
+		  u.user_name,
+		  g.name      AS guild_name
+		FROM guild_members m
+		  LEFT JOIN USER u
+		    ON m.user_id = u.id
+		  LEFT JOIN guild_info g
+		    ON m.guild_id = g.id
+		 WHERE m.user_id=#{userId} and m.guild_id=#{guildId}
+	</select>
+	
+	<select id="selectAdminMember" resultType="com.game.guild.domain.MemberVO" parameterType="int">
+		SELECT
+		  g.id           AS guild_id,
+		  g.name         AS guild_name,
+		  g.icon         AS icon,
+		  g.level        AS LEVEL,
+		  g.member_count AS member_count,
+		  g.currency     AS currency,
+		  g.slogan       AS slogan,
+		  g.discount_id  AS discount,
+		  g.status       AS STATUS,
+		  m.user_id      AS user_id,
+		  m.is_admin     AS is_admin,
+		  m.join_time    AS join_time,
+		  m.exp          AS EXP,
+		  m.point        AS POINT,
+		  u.user_name    AS user_name,
+		  u.nick_name    AS nick_name,
+		  u.mood         AS mood,
+		  v.name         AS groupName,
+		  u.head_icon,
+		  v.icon AS group_icon
+		FROM guild_members m
+		  RIGHT JOIN guild_info g
+		    ON m.guild_id = g.id and g.status='1'
+		  LEFT JOIN USER u
+		    ON m.user_id = u.id
+		  LEFT JOIN user_vip_group v
+		    ON u.group_id = v.id
+		WHERE m.user_id = #{userId}
+		    AND (m.is_admin = 1
+		          OR m.is_admin = 2)
+	</select>
+	
+	<select id="selectAdminByLevel" resultType="com.game.guild.domain.GuildMembers" parameterType="int">
+		SELECT 
+			m.id,
+			m.user_id,
+			m.guild_id,
+			m.level,
+			m.join_time,
+			m.apply_time,
+			m.exp,
+			m.point,
+			m.status,
+			g.name as guild_name,
+			u.user_name,
+			u.nick_name
+		FROM guild_members m 
+		left join guild_info g on m.guild_id=g.id and g.status='1'
+		left join user u on m.user_id=u.id
+		where m.is_admin &gt;0 and m.guild_id=#{guildId}
+	</select>
+		
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildMembers" parameterType="com.game.guild.domain.GuildMembers">
+		SELECT
+		  m.id,
+		  m.user_id,
+		  m.guild_id,
+		  m.level,
+		  m.join_time,
+		  m.apply_time,
+		  m.exp,
+		  m.point,
+		  m.is_admin,
+		  m.status,
+		  u.user_name,
+		  g.name      AS guild_name
+		FROM guild_members m
+		  LEFT JOIN USER u
+		    ON m.user_id = u.id
+		  LEFT JOIN guild_info g
+		    ON m.guild_id = g.id
+		<where>
+				<if test="id != null and id != ''">
+					and m.id = #{id}
+				</if>
+				<if test="userId != null and userId != ''">
+					and m.user_id = #{userId}
+				</if>
+				<if test="guildId != null and guildId != ''">
+					and m.guild_id = #{guildId}
+				</if>
+				<if test="level != null and level != ''">
+					and m.level = #{level}
+				</if>
+				<if test="joinTime != null and joinTime != ''">
+					and m.join_time = #{joinTime}
+				</if>
+				<if test="applyTime != null and applyTime != ''">
+					and m.apply_time = #{applyTime}
+				</if>
+				<if test="exp != null and exp != ''">
+					and m.exp = #{exp}
+				</if>
+				<if test="point != null and point != ''">
+					and m.point = #{point}
+				</if>
+				<if test="isAdmin != null and isAdmin != ''">
+					and m.is_admin = #{isAdmin}
+				</if>
+				<if test="status != null and status != ''">
+					and m.status = #{status}
+				</if>
+			</where>
+		ORDER BY m.id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildMembers" parameterType="int">
+		SELECT  id, user_id, guild_id, level, join_time, apply_time, exp, point, status FROM guild_members
+	</select>
+	
+	<select id="selectUsersByIds" resultType="int" parameterType="int">
+		select distinct user_id from guild_members where status=1 and id in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</select>
+
+	<select id="selectMemberList" resultType="com.game.guild.domain.GuildMembers" parameterType="com.game.common.basics.pagination.PageQuery">
+		SELECT
+		  m.id,
+		  m.user_id,
+		  m.guild_id,
+		  m.level,
+		  m.join_time,
+		  m.apply_time,
+		  m.exp,
+		  m.point,
+		  m.status,
+		  (CASE m.is_admin WHEN 2 THEN '会长' WHEN 1 THEN '管理员' ELSE l.name END) AS levelName,
+		  (CASE WHEN u.nick_name IS NULL THEN u.user_name WHEN u.nick_name ='' THEN u.user_name  ELSE u.nick_name END) AS nickName,
+		  u.head_icon,
+		  m.is_admin, g.name as guild_name
+		FROM guild_members m
+		  LEFT JOIN guild_member_level l
+		    ON m.level = l.id
+		  LEFT JOIN USER u
+		    ON m.user_id = u.id left join guild_info g on m.guild_id=g.id
+		WHERE m.guild_id =#{params.guildId} and m.status=#{params.status}
+		ORDER BY m.is_admin desc, m.level desc, m.point DESC	
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildMembers">
+		INSERT INTO guild_members
+		(
+		    user_id, guild_id, level, join_time, apply_time, exp, point, status, is_admin)
+		values 
+		(
+		    #{userId} , #{guildId} , #{level} , #{joinTime} , #{applyTime} , #{exp} , #{point}, #{status}, #{isAdmin}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildMembers">
+		UPDATE guild_members 
+		SET  id=#{id} , user_id=#{userId} , guild_id=#{guildId} , level=#{level} , join_time=#{joinTime} , 
+		apply_time=#{applyTime} , exp=#{exp} , point=#{point}, status=#{status}, is_admin=#{isAdmin}  WHERE id=#{id}
+	</update>
+	
+	<update id="updateMemberApply" parameterType="int">
+		UPDATE guild_members SET status=1, apply_time=now() WHERE id=#{id}
+	</update>
+	<update id="updateMemberApplyByIds" parameterType="java.lang.Integer">
+		UPDATE guild_members SET status=1, apply_time=now() WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</update>
+	
+	<update id="updateMemberIsAdmin" parameterType="int">
+		UPDATE guild_members SET is_admin='1' WHERE id=#{id}
+	</update>
+	<update id="updateMemberRemoveAdmin" parameterType="int">
+		UPDATE guild_members SET is_admin='0' WHERE id=#{id}
+	</update>	
+	<delete id="deleteByUserAndGuild" parameterType="map">
+		<![CDATA[
+			DELETE FROM guild_members WHERE user_id=#{userId} and guild_id=#{guildId}
+		]]>
+	</delete>
+	
+	<delete id="deleteByUserId" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_members WHERE user_id=#{userId}
+		]]>
+	</delete>
+	
+	<delete id="deleteApplyUserExcludeCurrGuild" parameterType="map">
+		delete FROM guild_members where user_id in (select * from(
+			select user_id from guild_members where id in
+			<foreach collection="ids" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		<![CDATA[
+			)temp) and status=0 and guild_id <> #{guildId}
+		]]>
+	</delete>
+	
+	<delete id="deleteByGuildId" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_members WHERE guild_id=#{guildId}
+		]]>
+	</delete>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_members WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_members WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

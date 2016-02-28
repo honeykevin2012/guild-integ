@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.PlatformAppVersionDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id AS id,
+		version_code AS versionCode,
+		version_name AS versionName,
+		remark AS remark,
+		url AS url,
+		is_force AS isForce,
+		client_type AS clientType FROM platform_app_version
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.platform.domain.PlatformAppVersion" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.versionCode != null and params.versionCode != ''">
+					and version_code = #{params.versionCode}
+				</if>
+				<if test="params.versionName != null and params.versionName != ''">
+					and version_name = #{params.versionName}
+				</if>
+				<if test="params.remark != null and params.remark != ''">
+					and remark = #{params.remark}
+				</if>
+				<if test="params.url != null and params.url != ''">
+					and url = #{params.url}
+				</if>
+				<if test="params.isForce != null and params.isForce != ''">
+					and is_force = #{params.isForce}
+				</if>
+				<if test="params.clientType != null and params.clientType != ''">
+					and client_type = #{params.clientType}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.platform.domain.PlatformAppVersion" parameterType="int">
+		SELECT  id AS id, version_code AS versionCode, version_name AS versionName, remark AS remark, url AS url, is_force AS isForce, client_type AS clientType FROM platform_app_version WHERE id=#{id}
+	</select>
+	
+	<select id="selectByVersionAndType" resultType="com.game.platform.domain.PlatformAppVersion" parameterType="map">
+		<![CDATA[
+			SELECT  
+				id AS id, version_code AS versionCode, version_name AS versionName, remark AS remark, url AS url, 
+				is_force AS isForce, client_type AS clientType 
+			FROM platform_app_version 
+			WHERE client_type=#{clientType}
+		]]>
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.platform.domain.PlatformAppVersion" parameterType="com.game.platform.domain.PlatformAppVersion">
+		SELECT  id AS id, version_code AS versionCode, version_name AS versionName, remark AS remark, url AS url, is_force AS isForce, client_type AS clientType FROM platform_app_version
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="versionCode != null and versionCode != ''">
+					and version_code = #{versionCode}
+				</if>
+				<if test="versionName != null and versionName != ''">
+					and version_name = #{versionName}
+				</if>
+				<if test="remark != null and remark != ''">
+					and remark = #{remark}
+				</if>
+				<if test="url != null and url != ''">
+					and url = #{url}
+				</if>
+				<if test="isForce != null and isForce != ''">
+					and is_force = #{isForce}
+				</if>
+				<if test="clientType != null and clientType != ''">
+					and client_type = #{clientType}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.PlatformAppVersion" parameterType="int">
+		SELECT  id AS id, version_code AS versionCode, version_name AS versionName, remark AS remark, url AS url, is_force AS isForce, client_type AS clientType FROM platform_app_version
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.PlatformAppVersion">
+		INSERT INTO platform_app_version
+		(
+		    version_code, version_name, remark, url, is_force, client_type)
+		values 
+		(
+		    #{versionCode} , #{versionName} , #{remark} , #{url} , #{isForce} , #{clientType} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.PlatformAppVersion">
+		UPDATE platform_app_version 
+		SET  id=#{id} , version_code=#{versionCode} , version_name=#{versionName} , remark=#{remark} , url=#{url} , is_force=#{isForce} , client_type=#{clientType}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM platform_app_version WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM platform_app_version WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

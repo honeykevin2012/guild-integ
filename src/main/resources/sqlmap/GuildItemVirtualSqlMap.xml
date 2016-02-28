@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildItemVirtualDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id,
+		item_id,
+		code_id,
+		active_code,
+		card_number,
+		status,
+		user_id,
+		get_item_time,
+		version FROM guild_item_virtual
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildItemVirtual" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.itemId != null and params.itemId != ''">
+					and item_id = #{params.itemId}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and status = #{params.status}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.getItemTime != null and params.getItemTime != ''">
+					and get_item_time = #{params.getItemTime}
+				</if>
+				<if test="params.version != null and params.version != ''">
+					and version = #{params.version}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildItemVirtual" parameterType="int">
+		SELECT  id, item_id, code_id, active_code, card_number, status, user_id, get_item_time, version FROM guild_item_virtual WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildItemVirtual" parameterType="com.game.guild.domain.GuildItemVirtual">
+		SELECT  id, item_id, code_id, active_code, card_number, status, user_id, get_item_time, version FROM guild_item_virtual
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="itemId != null and itemId != ''">
+					and item_id = #{itemId}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="getItemTime != null and getItemTime != ''">
+					and get_item_time = #{getItemTime}
+				</if>
+				<if test="version != null and version != ''">
+					and version = #{version}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildItemVirtual" parameterType="int">
+		SELECT  id, item_id, active_code, card_number, status, user_id, get_item_time, version FROM guild_item_virtual
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildItemVirtual">
+		INSERT INTO guild_item_virtual
+		(
+		    item_id, active_code, card_number, status, user_id, get_item_time, version)
+		values 
+		(
+		    #{itemId} , #{activeCode} , #{cardNumber}, #{status} , #{userId} , now() , #{version} 
+		)
+	</insert>
+	
+	<insert id="insertVirtualItems" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildItemVirtual">
+		INSERT INTO guild_item_virtual
+		(
+		    item_id, code_id, active_code, card_number, status, user_id, give_item_time, version
+		)
+		values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+		(
+			#{item.itemId}, #{item.codeId}, #{item.activeCode}, #{item.cardNumber}, #{item.status}, #{item.userId}, now(), 0
+		)
+		</foreach>
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT INTO guild_item_virtual
+		(item_id, active_code_id)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.itemId}, #{item.activeCodeId})
+		</foreach>
+	</insert>
+	 
+	<update id="update" parameterType="com.game.guild.domain.GuildItemVirtual">
+		UPDATE guild_item_virtual 
+		SET item_id=#{itemId} , active_code=#{activeCode}, card_number=#{cardNumber}, status=#{status} , user_id=#{userId}, get_item_time=#{getItemTime} , version=#{version}  WHERE id=#{id}
+	</update>
+
+
+	<update id="updateItemMove" parameterType="com.game.guild.domain.GuildItemVirtual">
+		UPDATE guild_item_virtual
+		SET stock_id = #{stockId},status=#{status}
+		WHERE item_id = #{itemId}  AND STATUS = 0
+		LIMIT #{limit}		
+	</update>
+	
+	<update id="updateStockMove" parameterType="com.game.guild.domain.GuildItemVirtual">
+		UPDATE guild_item_virtual
+		SET status=#{status}
+		WHERE item_id = #{itemId} and stock_id = #{stockId}  AND STATUS = 1		
+	</update>
+	<update id="updateGiveUser" parameterType="com.game.guild.domain.GuildItemVirtual">
+		UPDATE guild_item_virtual
+		SET user_id = #{userId}, status=2, give_item_time=now()
+		WHERE item_id = #{itemId} AND STATUS = 0
+		LIMIT #{limit}
+	</update>
+	<update id="updateGetGift" parameterType="com.game.guild.domain.GuildItemVirtual">
+		UPDATE guild_item_virtual
+		SET status=3, get_item_time=now()
+		WHERE item_id=#{itemId} and user_id = #{userId} AND STATUS = 2
+		LIMIT #{limit}		
+	</update>	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_item_virtual WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_item_virtual WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<select id="selectMyitem" parameterType="com.game.common.basics.pagination.PageQuery" resultType="map" useCache="false">
+		SELECT i.id,
+		  i.guild_name as guildName,
+		  i.game_name gameName,
+		  i.name as itemName,
+		  i.remark,
+		  uac.code
+		FROM guild_item_virtual iv
+		  LEFT JOIN (SELECT
+		               gi.id,
+		               gi.name,
+		               gi.is_virtual,
+		               act.remark,
+		               gif.name      AS guild_name,
+		               ga.name       AS game_name
+		             FROM guild_item gi
+		               LEFT JOIN user_active_code_type act
+		                 ON gi.type_id = act.id
+		               LEFT JOIN platform_game_app ga
+		                 ON act.game_id = ga.id
+		               LEFT JOIN guild_info gif
+		                 ON gi.guild_id = gif.id
+		             WHERE gi.is_virtual = 1) i
+		    ON iv.item_id = i.id
+		  LEFT JOIN user_active_code uac
+		    ON iv.active_code_id = uac.Id
+		WHERE iv.status = '3'
+		    AND iv.user_id = #{params.userId}
+		    order by iv.give_item_time desc
+	</select>
+</mapper>

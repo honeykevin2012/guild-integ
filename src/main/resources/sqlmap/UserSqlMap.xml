@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id AS id,
+		user_name AS userName,
+		user_pwd AS userPwd,
+		sex AS sex,
+		phone AS phone,
+		email AS email,
+		head_icon AS headIcon,
+		crate_time AS crateTime,
+		source_from AS sourceFrom,
+		mac AS mac,
+		imei AS imei,
+		os_version AS osVersion,
+		os AS os,
+		status AS status,
+		group_id AS groupId,
+		last_login_time AS lastLoginTime,
+		balance AS balance,
+		qq AS qq,
+		birthday AS birthday,
+		point AS point,
+		exp AS exp,
+		version AS version  
+		FROM user
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.User" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.userName != null and params.userName != ''">
+					and user_name = #{params.userName}
+				</if>
+				<if test="params.userPwd != null and params.userPwd != ''">
+					and user_pwd = #{params.userPwd}
+				</if>
+				<if test="params.sex != null and params.sex != ''">
+					and sex = #{params.sex}
+				</if>
+				<if test="params.phone != null and params.phone != ''">
+					and phone = #{params.phone}
+				</if>
+				<if test="params.email != null and params.email != ''">
+					and email = #{params.email}
+				</if>
+				<if test="params.headIcon != null and params.headIcon != ''">
+					and head_icon = #{params.headIcon}
+				</if>
+				<if test="params.crateTime != null and params.crateTime != ''">
+					and crate_time = #{params.crateTime}
+				</if>
+				<if test="params.sourceFrom != null and params.sourceFrom != ''">
+					and source_from = #{params.sourceFrom}
+				</if>
+				<if test="params.mac != null and params.mac != ''">
+					and mac = #{params.mac}
+				</if>
+				<if test="params.imei != null and params.imei != ''">
+					and imei = #{params.imei}
+				</if>
+				<if test="params.osVersion != null and params.osVersion != ''">
+					and os_version = #{params.osVersion}
+				</if>
+				<if test="params.os != null and params.os != ''">
+					and os = #{params.os}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and status = #{params.status}
+				</if>
+				<if test="params.groupId != null and params.groupId != ''">
+					and group_id = #{params.groupId}
+				</if>
+				<if test="params.lastLoginTime != null and params.lastLoginTime != ''">
+					and last_login_time = #{params.lastLoginTime}
+				</if>
+				<if test="params.balance != null and params.balance != ''">
+					and balance = #{params.balance}
+				</if>
+				<if test="params.qq != null and params.qq != ''">
+					and qq = #{params.qq}
+				</if>
+				<if test="params.birthday != null and params.birthday != ''">
+					and birthday = #{params.birthday}
+				</if>
+				<if test="params.point != null and params.point != ''">
+					and point = #{params.point}
+				</if>
+				<if test="params.exp != null and params.exp != ''">
+					and exp = #{params.exp}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<resultMap id="userResultMap" type="com.game.user.domain.User">
+        <id property="id" column="id" />
+        <result property="userName" column="user_name" />
+        <result property="nickName" column="nick_name" />
+       	<result property="mood" column="mood" />
+        <result property="userPwd" column="user_pwd" />
+        <result property="sex" column="sex" />
+        <result property="phone" column="phone" />
+        <result property="email" column="email" />
+        <result property="locationId" column="location_id" />
+        <result property="headIcon" column="head_icon" />
+        <result property="crateTime" column="crate_time" />
+        <result property="sourceFrom" column="source_from" />
+        <result property="mac" column="mac" />
+        <result property="imei" column="imei" />
+        <result property="osVersion" column="os_version" />
+        <result property="os" column="os" />
+        <result property="status" column="status" />
+        <result property="groupId" column="group_id" />
+        <result property="lastLoginTime" column="last_login_time" />
+        <result property="balance" column="balance" />
+        <result property="qq" column="qq" />
+        <result property="birthday" column="birthday" />
+        <result property="point" column="point" />
+        <result property="exp" column="exp" />
+        <result property="version" column="version" />
+        <result property="groupName" column="group_name" />
+        <result property="groupLevel" column="group_level" />
+        <result property="groupIcon" column="group_icon" />
+        <result property="groupAmount" column="group_amount" />
+        <result property="locationName" column="location_name" />
+        <result property="registerType" column="register_type" />
+        <result property="amount" column="cost" />
+        <association property="group" javaType="com.game.user.domain.UserVipGroup">
+        	<id property="id" column="group_id" />
+        	<id property="name" column="group_name" />
+        	<id property="amount" column="group_amount" />
+        	<id property="level" column="group_level" />
+        	<id property="point" column="group_point" />
+        	<id property="icon" column="group_icon" />
+        	<id property="isDefault" column="is_default" />
+        	<id property="discount" column="group_discount" />
+        </association>
+    </resultMap>
+	
+	<select id="select" resultMap="userResultMap" parameterType="int">
+		SELECT
+		  u.id              AS id,
+		  u.user_name       AS user_name,
+		  u.nick_name       AS nick_name,
+		  u.mood,
+		  u.user_pwd        AS user_pwd,
+		  u.sex             AS sex,
+		  u.phone           AS phone,
+		  u.email           AS email,
+		  u.location_id     AS location_id,
+		  u.head_icon       AS head_icon,
+		  u.crate_time      AS crate_time,
+		  u.source_from     AS source_from,
+		  u.mac             AS mac,
+		  u.imei            AS imei,
+		  u.os_version      AS os_version,
+		  u.os              AS os,
+		  u.STATUS          AS status,
+		  u.group_id        AS group_id,
+		  u.last_login_time AS last_login_time,
+		  u.balance         AS balance,
+		  u.qq              AS qq,
+		  DATE_FORMAT(u.birthday, '%Y-%m-%d') AS birthday,
+		  u.POINT           AS point,
+		  u.EXP             AS exp,
+		  u.version         AS version,
+		  u.register_type   AS register_type,
+		  g.id as group_id, g.level as group_level, g.point as group_point,
+		  g.name as group_name, g.level as group_level, g.icon as group_icon,
+		  g.is_default as is_default, g.amount as group_amount, g.discount as group_discount,
+		  i.address as location_name,
+		  case when sum(o.pay_amount) is null then 0 else sum(o.pay_amount) end as cost
+		FROM user u left join user_address_info i on u.location_id=i.id left join user_vip_group g on u.group_id=g.id
+		left join user_order o on u.id=o.user_id and o.status=1
+		WHERE u.id=#{id}
+	</select>
+	<select id="selectByIds" resultType="com.game.user.domain.User" parameterType="java.lang.String">
+		SELECT
+		  id              AS id,
+		  user_name       AS userName,
+		  nick_name       AS nickName,
+		  mood,
+		  user_pwd        AS userPwd,
+		  sex             AS sex,
+		  phone           AS phone,
+		  email           AS email,
+		  head_icon       AS headIcon,
+		  crate_time      AS crateTime,
+		  source_from     AS sourceFrom,
+		  mac             AS mac,
+		  imei            AS imei,
+		  os_version      AS osVersion,
+		  os              AS os,
+		  STATUS          AS STATUS,
+		  group_id        AS groupId,
+		  last_login_time AS lastLoginTime,
+		  balance         AS balance,
+		  qq              AS qq,
+		  DATE_FORMAT(birthday, '%Y-%m-%d') AS birthday,
+		  POINT           AS POINT,
+		  EXP             AS EXP,
+		  educational,
+		  register_type,
+		  version         AS version  
+		FROM USER WHERE id in 
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		order by FIELD(id,
+		<foreach collection="array" item="item" open="" separator="," close="">
+			#{item}
+		</foreach>						
+			)
+	</select>
+	<select id="selectByEntity" resultType="com.game.user.domain.User" parameterType="com.game.user.domain.User">
+		SELECT  id AS id, user_name AS userName, user_pwd AS userPwd, sex AS sex, phone AS phone, email AS email, head_icon AS headIcon, crate_time AS crateTime, source_from AS sourceFrom, mac AS mac, imei AS imei, os_version AS osVersion, os AS os, status AS status, group_id AS groupId, last_login_time AS lastLoginTime, balance AS balance, qq AS qq, birthday AS birthday, point AS point, exp AS exp FROM user
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="userName != null and userName != ''">
+					and user_name = #{userName}
+				</if>
+				<if test="userPwd != null and userPwd != ''">
+					and user_pwd = #{userPwd}
+				</if>
+				<if test="sex != null and sex != ''">
+					and sex = #{sex}
+				</if>
+				<if test="phone != null and phone != ''">
+					and phone = #{phone}
+				</if>
+				<if test="email != null and email != ''">
+					and email = #{email}
+				</if>
+				<if test="headIcon != null and headIcon != ''">
+					and head_icon = #{headIcon}
+				</if>
+				<if test="crateTime != null and crateTime != ''">
+					and crate_time = #{crateTime}
+				</if>
+				<if test="sourceFrom != null and sourceFrom != ''">
+					and source_from = #{sourceFrom}
+				</if>
+				<if test="mac != null and mac != ''">
+					and mac = #{mac}
+				</if>
+				<if test="imei != null and imei != ''">
+					and imei = #{imei}
+				</if>
+				<if test="osVersion != null and osVersion != ''">
+					and os_version = #{osVersion}
+				</if>
+				<if test="os != null and os != ''">
+					and os = #{os}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+				<if test="groupId != null and groupId != ''">
+					and group_id = #{groupId}
+				</if>
+				<if test="lastLoginTime != null and lastLoginTime != ''">
+					and last_login_time = #{lastLoginTime}
+				</if>
+				<if test="balance != null and balance != ''">
+					and balance = #{balance}
+				</if>
+				<if test="qq != null and qq != ''">
+					and qq = #{qq}
+				</if>
+				<if test="birthday != null and birthday != ''">
+					and birthday = #{birthday}
+				</if>
+				<if test="point != null and point != ''">
+					and point = #{point}
+				</if>
+				<if test="exp != null and exp != ''">
+					and exp = #{exp}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.User" parameterType="int">
+		SELECT 
+			id AS id, user_name AS userName, user_pwd AS userPwd, sex AS sex, phone AS phone, 
+			email AS email, head_icon AS headIcon, crate_time AS crateTime, source_from AS sourceFrom, 
+			mac AS mac, imei AS imei, os_version AS osVersion, os AS os, status AS status, group_id AS groupId, 
+			last_login_time AS lastLoginTime, balance AS balance, qq AS qq, birthday AS birthday, educational,
+		  	register_type, point AS point, exp AS exp 
+		FROM user
+	</select>
+	
+	<select id="selectCostTopQuantity" resultType="com.alibaba.fastjson.JSONObject" parameterType="int">
+		select 
+			u.id as userId,
+			u.group_id as groupId,
+			u.head_icon as avatar,
+			case when u.nick_name is null then u.user_name else u.nick_name end as userName,
+			sum(pay_amount) as amount 
+		from user_order o, user u 
+		where o.status='1' and o.user_id=u.id 
+		group by o.user_id 
+		order by amount desc limit #{limit}
+	</select>
+	
+	<select id="selectUserGroup" resultType="com.game.user.domain.User" parameterType="int">
+		SELECT  
+			u.id AS id, u.user_name AS userName, u.nick_name as nickName, u.mood, u.user_pwd AS userPwd, u.sex AS sex, 
+			u.phone AS phone, u.email AS email, u.head_icon AS headIcon, u.crate_time AS crateTime, u.register_type as register_type,
+			u.source_from AS sourceFrom, u.mac AS mac, u.imei AS imei, u.os_version AS osVersion, u.educational as educational,
+			u.os AS os, u.status AS status, u.group_id AS groupId, u.last_login_time AS lastLoginTime, 
+			u.balance AS balance, u.qq AS qq, DATE_FORMAT(u.birthday, '%Y-%m-%d') AS birthday, u.point AS point, u.exp AS exp,
+		    g.name as groupName, g.level as groupLevel,client_ip, g.amount as groupAmount, g.icon as groupIcon
+		FROM user u left join user_vip_group g
+		on u.group_id=g.id where u.id=#{userId}
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.User">
+		INSERT INTO user
+		(
+		    user_name, user_pwd, sex, phone, email, head_icon, crate_time, source_from, mac, imei, 
+		    os_version, os, group_id, last_login_time, balance, qq, birthday, client_ip, register_type, educational)
+		values 
+		(
+		    #{userName} , #{userPwd} , #{sex} , #{phone} , #{email} , #{headIcon} , #{crateTime} , 
+		    #{sourceFrom} , #{mac} , #{imei} , #{osVersion} , #{os} , #{groupId} , 
+		    #{lastLoginTime} , #{balance} , #{qq} , #{birthday} , #{clientIp}, #{registerType}, #{educational}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.User">
+		UPDATE user 
+		SET user_name=#{userName} , user_pwd=#{userPwd} , sex=#{sex} , phone=#{phone} , email=#{email} ,
+			head_icon=#{headIcon} , crate_time=#{crateTime} , source_from=#{sourceFrom} , mac=#{mac} , imei=#{imei} ,
+		 	os_version=#{osVersion} , os=#{os} , status=#{status} , group_id=#{groupId} , last_login_time=#{lastLoginTime} ,
+		  	balance=#{balance} , qq=#{qq} , birthday=#{birthday} , point=#{point} , exp=#{exp}, educational=#{educational}
+		WHERE id=#{id}
+	</update>
+	
+	<update id="updateBalance" parameterType="com.game.user.domain.User">
+		UPDATE user 
+		SET  balance=#{balance} , version=version+1  where id=#{id} and version=#{version}
+	</update>
+	<update id="updatePoint" parameterType="com.game.user.domain.User">
+		UPDATE user 
+		SET  point=#{point} , version=version+1  where id=#{id} and version=#{version}
+	</update>
+
+	<update id="updateUserInfo" parameterType="com.game.user.domain.User">
+		UPDATE user 
+		SET user_name=#{userName},register_type=#{registerType},sex=#{sex} ,nick_name=#{nickName}, phone=#{phone} , email=#{email} , head_icon=#{headIcon} , location_id= #{locationId},
+			qq=#{qq} , birthday=#{birthday}, mood=#{mood}, educational=#{educational}
+		WHERE id=#{id}
+	</update>
+	
+	<update id="updateUserVipGroup" parameterType="int">
+			<![CDATA[
+		UPDATE USER
+		SET group_id =  (SELECT
+		                  id
+		                FROM user_vip_group
+		WHERE LEVEL = (SELECT
+		                 MAX(LEVEL) AS LEVEL
+		               FROM user_vip_group
+		               WHERE amount < (SELECT
+		                                 SUM(total_amount) AS total
+		                               FROM user_order
+		                               WHERE user_id = #{userId}
+		                                   AND STATUS = 0)))
+		                                   WHERE id = #{userId} 
+		    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<select id="selectCheckUserExists" resultType="com.game.user.domain.User" parameterType="Map">
+		SELECT 
+			id AS id, user_name AS userName, user_pwd AS userPwd, sex AS sex, phone AS phone, 
+			email AS email, head_icon AS headIcon, crate_time AS crateTime, source_from AS sourceFrom, 
+			mac AS mac, imei AS imei, os_version AS osVersion, os AS os, status AS status, group_id AS groupId, 
+			last_login_time AS lastLoginTime, balance AS balance, qq AS qq, birthday AS birthday, point AS point, 
+			exp AS exp 
+		FROM user 
+		WHERE user_name=#{userName} and user_pwd=#{userPassword}
+	</select>
+	
+	<select id="selectCheckUserExistsByName" resultType="com.game.user.domain.User" parameterType="string">
+		SELECT  id AS id, user_name AS userName, user_pwd AS userPwd, sex AS sex, phone AS phone, 
+		email AS email, head_icon AS headIcon, crate_time AS crateTime, source_from AS sourceFrom, 
+		mac AS mac, imei AS imei, os_version AS osVersion, os AS os, status AS status, group_id AS groupId, 
+		last_login_time AS lastLoginTime, balance AS balance, qq AS qq, birthday AS birthday, point AS point, 
+		exp AS exp FROM user WHERE user_name=#{userName}
+	</select>
+</mapper>

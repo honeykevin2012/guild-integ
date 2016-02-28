@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.PlatformGameAppDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+	SELECT
+	  g.id                   AS id,
+	  CODE                   AS code,
+	  NAME                   AS name,
+	  icon                   AS icon,
+	  commend,
+	  remark                 AS remark,
+	  site_page_url,
+	  download_times,
+	  TYPE,
+	  package_size,
+	  download_times,
+	  exchange_divide,
+	  screenshot,
+	  game_amount_query_url,
+	  game_amount_deduct_url,
+	  download_url,
+	  download_ios_url,
+	  m.id,
+	  m.user_id,
+	  m.content,
+	  m.up_point,
+	  m.under_point,
+	  m.channel,
+	  m.create_time,
+	  m.ip,
+	  m.user_name,
+	  m.head_icon
+	FROM platform_game_app g
+	  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m
+	    ON g.code = m.data_id
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultMap="gameResultMap"  useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and g.id = #{params.id}
+				</if>
+				<if test="params.code != null and params.code != ''">
+					and g.code = #{params.code}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and g.name = #{params.name}
+				</if>
+				<if test="params.icon != null and params.icon != ''">
+					and g.icon = #{params.icon}
+				</if>
+				<if test="params.remark != null and params.remark != ''">
+					and g.remark = #{params.remark}
+				</if>
+			</where>
+		ORDER BY g.id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT id AS id, code AS code, name AS name, icon AS icon,commend, 
+		remark AS remark,site_page_url,download_times,type,package_size ,exchange_divide, game_amount_query_url,
+		game_amount_deduct_url 
+		FROM platform_game_app WHERE id=#{id}
+	</select>
+	<select id="selectExchangeList" resultType="map" >
+		SELECT g.code,g.name,CONCAT(ROUND(((t.one/t.two)-1)*100,2),'%') AS trend
+		FROM platform_game_app_trend t LEFT JOIN platform_game_app g ON t.game_id=g.code
+		order by trend desc
+	</select>
+	
+	<select id="selectByCode" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT id AS id, code AS code, name AS name, icon AS icon,commend, 
+		remark AS remark,site_page_url,download_times,type,package_size ,exchange_divide, screenshot, game_amount_query_url,
+		game_amount_deduct_url 
+		FROM platform_game_app WHERE code=#{code}
+	</select>
+	
+	<select id="selectByProductId" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT 
+			g.id AS id, g.code AS code, g.name AS name, g.icon AS icon,g.commend, g.remark AS remark, 
+			g.site_page_url as site_page_url, g.download_times as download_times, g.type,package_size as package_size, screenshot, g.game_amount_query_url,
+			g.game_amount_deduct_url 
+		FROM platform_game_app g, ref_product_game r 
+		WHERE g.id=r.game_id and r.product_id=#{productId}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.platform.domain.PlatformGameApp" parameterType="com.game.platform.domain.PlatformGameApp">
+		SELECT 
+			id AS id, code AS code, name AS name, icon AS icon,commend, remark AS remark, 
+			site_page_url,download_times, type, package_size 
+		FROM platform_game_app
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="code != null and code != ''">
+					and code = #{code}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="icon != null and icon != ''">
+					and icon = #{icon}
+				</if>
+				<if test="remark != null and remark != ''">
+					and remark = #{remark}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT  
+		g.id AS id, CODE AS CODE, NAME AS NAME, icon AS icon,commend, 
+		remark AS remark, site_page_url, download_times, TYPE, package_size,
+		download_times, exchange_divide, screenshot, game_amount_query_url, game_amount_deduct_url,
+		CONCAT(a.one,',',a.two, ',',a.three,',',a.four,',',a.five,',',a.six,',',a.seven) AS trend
+		FROM platform_game_app g LEFT JOIN platform_game_app_trend a ON g.code=a.game_id
+	</select>
+
+	<select id="selectAllByUserId" resultMap="gameResultMap" parameterType="int">
+		SELECT
+		  g.id                   AS id,
+		  CODE                   AS code,
+		  NAME                   AS name,
+		  icon                   AS icon,
+		  commend,
+		  remark                 AS remark,
+		  site_page_url,
+		  download_times,
+		  TYPE,
+		  package_size,
+		  download_times,
+		  exchange_divide,
+		  screenshot,
+		  game_amount_query_url,
+		  game_amount_deduct_url,
+		  download_url,
+		  download_ios_url,
+		  CONCAT(a.one,',',a.two, ',',a.three,',',a.four,',',a.five,',',a.six,',',a.seven) AS trend,
+		  COALESCE(e.expend,0) AS expend,
+		   m.id,
+		  m.user_id,
+		  m.content,
+		  m.up_point,
+		  m.under_point,
+		  m.channel,
+		  m.create_time,
+		  m.ip,
+		  m.user_name,
+		  m.head_icon
+		FROM platform_game_app g
+		  LEFT JOIN platform_game_app_trend a
+		    ON g.code = a.game_id
+		  LEFT JOIN (SELECT
+		               game_id,
+		               COALESCE(SUM(exchange_nb_gold),0) AS expend
+		             FROM user_game_deducting_process p
+		             WHERE p.user_id = #{userId}
+		                 AND p.status = 1
+		             GROUP BY p.game_id) e
+		    ON g.code = e.game_id
+		  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m
+		    ON g.code = m.data_id		    
+    
+	</select>
+	
+		<select id="selectItem" resultMap="gameResultMap"  parameterType="map">
+		SELECT
+		  g.id                   AS id,
+		  CODE                   AS code,
+		  NAME                   AS name,
+		  icon                   AS icon,
+		  commend,
+		  remark                 AS remark,
+		  site_page_url,
+		  download_times,
+		  TYPE,
+		  package_size,
+		  download_times,
+		  exchange_divide,
+		  screenshot,
+		  game_amount_query_url,
+		  game_amount_deduct_url,
+		  download_url,
+		  download_ios_url,
+		  CONCAT(a.one,',',a.two, ',',a.three,',',a.four,',',a.five,',',a.six,',',a.seven) AS trend,
+		  COALESCE(e.expend,0) AS expend,
+	   m.id,
+		  m.user_id,
+		  m.content,
+		  m.up_point,
+		  m.under_point,
+		  m.channel,
+		  m.create_time,
+		  m.ip,
+		  m.user_name,
+		  m.head_icon		  
+		FROM platform_game_app g
+		  LEFT JOIN platform_game_app_trend a
+		    ON g.code = a.game_id
+		  LEFT JOIN (SELECT
+		               game_id,
+		               COALESCE(SUM(exchange_nb_gold),0) AS expend
+		             FROM user_game_deducting_process p
+		             WHERE p.user_id = #{userId}
+		                 AND p.status = 1
+		             GROUP BY p.game_id) e
+		    ON g.code = e.game_id
+		  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m
+		    ON g.code = m.data_id			    
+		    where g.code=#{code}
+    
+	</select>
+	
+	<select id="selectJoinGames" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT  
+			g.id AS id, g.code AS code, g.name AS name, g.icon AS icon, g.commend, g.screenshot,
+			g.remark AS remark, g.site_page_url as site_page_url, g.download_times as download_times, g.type as type, 
+	    	g.package_size as package_size, case when r.game_code is null then 0 else 1 end as joined
+		FROM platform_game_app g left join ref_guild_game r on g.code=r.game_code and r.guild_id=#{guildId}
+		order by joined desc
+	</select>
+
+	<select id="selectConsumeTopList" resultType="map" parameterType="int">
+		SELECT
+		  p.user_id,
+		  u.user_name,
+		  SUM(exchange_nb_gold) AS expend
+		FROM user_game_deducting_process p
+		  LEFT JOIN USER u
+		    ON p.user_id = u.id
+		WHERE p.game_id = #{id}
+		GROUP BY user_id
+		ORDER BY expend DESC
+		LIMIT 3
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.PlatformGameApp">
+		INSERT INTO platform_game_app
+		(
+		    code, name, icon, remark)
+		values 
+		(
+		    #{code} , #{name} , #{icon} , #{remark} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.PlatformGameApp">
+		UPDATE platform_game_app 
+		SET  id=#{id} , code=#{code} , name=#{name} , icon=#{icon} , remark=#{remark}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM platform_game_app WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM platform_game_app WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<select id="selectByUserId" resultType="com.game.platform.domain.PlatformGameApp" parameterType="int">
+		SELECT
+		  g.id     AS id,
+		  g.code   AS code,
+		  g.name   AS name,
+		  g.icon   AS icon,
+		  g.commend,
+		  g.remark AS remark,
+		  g.site_page_url,
+		  g.download_times,
+		  g.exchange_divide, 
+		  g.screenshot,
+		  g.game_amount_query_url, 
+		  g.game_amount_deduct_url 
+		FROM platform_game_app g
+		  LEFT JOIN ref_user_game u
+		    ON g.code = u.game_code
+		WHERE u.user_id = #{userId}	
+	</select>
+	
+	<select id="selectCommend" resultMap="gameResultMap"  parameterType="int">
+		SELECT
+		  g.id                   AS id,
+		  CODE                   AS code,
+		  NAME                   AS name,
+		  icon                   AS icon,
+		  commend,
+		  remark                 AS remark,
+		  site_page_url,
+		  download_times,
+		  TYPE,
+		  package_size,
+		  download_times,
+		  exchange_divide,
+		  screenshot,
+		  game_amount_query_url,
+		  game_amount_deduct_url,
+		  download_url,
+		  download_ios_url,
+		  m.id,
+		  m.user_id,
+		  m.content,
+		  m.up_point,
+		  m.under_point,
+		  m.channel,
+		  m.create_time,
+		  m.ip,
+		  m.user_name,
+		  m.head_icon
+		FROM platform_game_app g
+		  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m
+		    ON g.code = m.data_id
+		WHERE commend &gt; 0
+		ORDER BY commend DESC 	
+	</select>
+	<select id="selectGuildGamesByUserId" resultMap="gameResultMap" parameterType="map">
+		SELECT DISTINCT
+		  g.id                   AS id,
+		  CODE                   AS code,
+		  NAME                   AS name,
+		  icon                   AS icon,
+		  commend,
+		  remark                 AS remark,
+		  site_page_url,
+		  download_times,
+		  TYPE,
+		  package_size,
+		  download_times,
+		  exchange_divide,
+		  screenshot,
+		  game_amount_query_url,
+		  game_amount_deduct_url,
+		  download_url,
+		  download_ios_url,
+		  m.id,
+		  m.user_id,
+		  m.content,
+		  m.up_point,
+		  m.under_point,
+		  m.channel,
+		  m.create_time,
+		  m.ip,
+		  m.user_name,
+		  m.head_icon
+		FROM platform_game_app g
+		  RIGHT JOIN (SELECT DISTINCT
+		                g.game_code
+		              FROM guild_members m
+		                RIGHT JOIN ref_guild_game g
+		                  ON m.guild_id = g.guild_id
+		              WHERE m.user_id = #{userId}
+		                  AND STATUS = 1 UNION(SELECT
+		                                         CODE
+		                                       FROM platform_game_app
+		                                       ORDER BY commend DESC)) v
+		    ON v.game_code = g.code
+		  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m 
+		    ON g.code = m.data_id
+		LIMIT 0,#{limit}
+	</select>
+	
+	<resultMap id="gameResultMap" type="com.game.platform.domain.PlatformGameApp">
+        <id property="id" column="id" />
+        <result property="code" column="code" />
+       	<result property="name" column="name" />
+       	<result property="commend" column="commend" />
+        <result property="icon" column="icon" />
+        <result property="remark" column="remark" />
+        <result property="sitePageUrl" column="site_page_url" />
+         <result property="screenshot" column="screenshot" />
+        <result property="downloadTimes" column="download_times" />
+        <result property="type" column="type" />
+        <result property="packageSize" column="package_size" />
+        <result property="exchangeDivide" column="exchange_divide" />
+        <result property="gameAmountQueryUrl" column="game_amount_query_url" />
+        <result property="gameAmountDeductUrl" column="game_amount_deduct_url" />
+        <result property="trend" column="trend" />
+        <result property="downloadUrl" column="download_url" />
+        <result property="downloadIosUrl" column="download_ios_url" />
+        <result property="status" column="status" />
+        <collection property="commentsList" ofType="com.game.user.domain.UserComment">
+        	<id property="id" column="c_id" />
+        	<id property="userId" column="user_id" />
+        	<id property="content" column="content" />
+        	<id property="upPoint" column="up_point" />
+        	<id property="underPoint" column="under_point" />
+        	<id property="channel" column="channel" />
+        	<id property="createTime" column="create_time" />
+        	<id property="userName" column="user_name" />
+        	<id property="headIcon" column="head_icon" />
+        	<id property="ip" column="ip" />
+        	<id property="dataId" column="data_id" />
+        </collection>
+    </resultMap>	
+	<select id="selectGamesByGuildId" resultMap="gameResultMap" parameterType="int">
+		SELECT
+		  g.id                   AS id,
+		  CODE                   AS code,
+		  NAME                   AS name,
+		  icon                   AS icon,
+		  commend,
+		  remark                 AS remark,
+		  site_page_url,
+		  download_times,
+		  TYPE,
+		  package_size,
+		  exchange_divide,
+		  game_amount_query_url,
+		  game_amount_deduct_url,
+		  CONCAT(a.one,',',a.two, ',',a.three,',',a.four,',',a.five,',',a.six,',',a.seven) AS trend,
+		  download_url,
+		  download_ios_url,
+		  m.id,
+		  m.user_id,
+		  m.content,
+		  m.up_point,
+		  m.under_point,
+		  m.channel,
+		  m.create_time,
+		  m.ip,
+		  m.user_name,
+		  m.head_icon
+		FROM platform_game_app g
+		  LEFT JOIN platform_game_app_trend a
+		    ON g.code = a.game_id
+		  LEFT JOIN ref_guild_game v
+		    ON g.code = v.game_code
+		  LEFT JOIN (SELECT
+               c.*,
+               u.user_name,
+               u.head_icon
+             FROM user_comment c
+               LEFT JOIN USER u
+                 ON c.user_id = u.id
+             WHERE (SELECT
+                      COUNT(id)
+                    FROM user_comment
+                    WHERE data_id = c.data_id
+                        AND id &gt; c.id) &lt; 5
+                 AND c.channel = 1
+             ORDER BY c.data_id,c.id DESC) m
+		    ON g.code = m.data_id
+		WHERE v.guild_id = #{guildId}
+	</select>			
+</mapper>

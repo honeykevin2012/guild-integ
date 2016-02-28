@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="platformAttachmentDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformAttachmentDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="gameInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.platform.persistence.dao.GameInfoDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+		
+	<bean id="platformAppVersionDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformAppVersionDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="platformZoneDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformZoneDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="platformBlockCommentDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformBlockCommentDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="platformGameAppDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformGameAppDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="platformAdvertDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformAdvertDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+      
+    <bean id="platformDictDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformDictDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="platformFeedbackDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformFeedbackDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="platformGameTopicDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformGameTopicDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="platformAppIndexImgDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformAppIndexImgDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="messagePublishDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.MessagePublishDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="messageReaderDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.MessageReaderDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="messageReaderAttachDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.MessageReaderAttachDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+        
+    <bean id="platformGameAppTrendDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.platform.persistence.dao.PlatformGameAppTrendDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+</beans>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserCreditsDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id,
+		user_id,
+		active,
+		credits,
+		create_time,
+		share_url FROM user_credits
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserCredits" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.active != null and params.active != ''">
+					and active = #{params.active}
+				</if>
+				<if test="params.credits != null and params.credits != ''">
+					and credits = #{params.credits}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+				<if test="params.shareUrl != null and params.shareUrl != ''">
+					and share_url = #{params.shareUrl}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserCredits" parameterType="int">
+		SELECT  id, user_id, active, credits, create_time, share_url FROM user_credits WHERE id=#{id}
+	</select>
+	
+	<select id="selectActiveCount" resultType="int" parameterType="int">
+		SELECT  count(id) FROM user_credits WHERE user_id=#{userId} and active=#{type} and DATE_FORMAT(create_time,'%Y%m%d') = curdate()
+	</select>
+	
+	<select id="selectCreditsByUser" resultType="int" parameterType="int">
+		select sum(credits) as count from user_credits where user_id=#{userId}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserCredits" parameterType="com.game.user.domain.UserCredits">
+		SELECT  id, user_id, active, credits, create_time, share_url FROM user_credits
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="active != null and active != ''">
+					and active = #{active}
+				</if>
+				<if test="credits != null and credits != ''">
+					and credits = #{credits}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="shareUrl != null and shareUrl != ''">
+					and share_url = #{shareUrl}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserCredits" parameterType="int">
+		SELECT  id, user_id, active, credits, create_time, share_url FROM user_credits
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserCredits">
+		INSERT INTO user_credits
+		(
+		    user_id, active, credits, create_time, share_url)
+		values 
+		(
+		    #{userId} , #{active} , #{credits} , #{createTime} , #{shareUrl} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserCredits">
+		UPDATE user_credits 
+		SET  id=#{id} , user_id=#{userId} , active=#{active} , credits=#{credits} , create_time=#{createTime} , share_url=#{shareUrl}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_credits WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_credits WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

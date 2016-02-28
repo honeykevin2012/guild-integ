@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>
+	
+    <properties>
+    	<property name="dialect" value="mysql"/>
+	</properties>
+	<settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+    	<setting name="cacheEnabled" value="false" /> 
+        <setting name="useGeneratedKeys" value="true" /> 
+        <!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->  
+        <setting name="multipleResultSetsEnabled" value="true"/>
+        <setting name="defaultExecutorType" value="REUSE" /> 
+         <!-- 允许使用列标签代替列名 -->  
+        <setting name="useColumnLabel" value="true"/> 
+        <!-- 设置关联对象加载的形态，此处为按需加载字段(加载字段由SQL指 定)，不会加载关联表的所有字段，以提高性能 -->  
+        <setting name="aggressiveLazyLoading" value="false"/>  
+    </settings>
+     <!-- 类型处理器 -->  
+	<typeHandlers>
+    	<typeHandler javaType="List" jdbcType="VARCHAR" handler="com.game.common.basics.persistence.CommaStringTypeHandler"/>
+    	<typeHandler javaType="String" jdbcType="TINYINT" handler="com.game.common.basics.persistence.BooleanIntegerTypeHandler"/>
+    	<typeHandler javaType="Long" jdbcType="TIMESTAMP" handler="com.game.common.basics.persistence.TimestampToLongTypeHandler"/>
+    	<typeHandler javaType="java.util.Map" jdbcType="VARCHAR" handler="com.game.common.basics.persistence.JSONHandler"/> 
+    	<typeHandler javaType="java.util.List" jdbcType="VARCHAR" handler="com.game.common.basics.persistence.JSONHandler"/> 
+	</typeHandlers>
+    <plugins>
+		<plugin interceptor="com.game.common.basics.pagination.PageInterceptor">
+			<property name="dbType" value="MYSQL"/>
+		</plugin>
+	</plugins>
+    <mappers>
+    	<!-- -->
+    	<mapper resource="sqlmap/ProductInfoSqlMap.xml" />
+    	<mapper resource="sqlmap/ProductInfoVirtualSqlMap.xml" />
+    	<mapper resource="sqlmap/UserSqlMap.xml" />
+    	<mapper resource="sqlmap/UserDataItemsSqlMap.xml" />
+    	<mapper resource="sqlmap/UserActiveCodeSqlMap.xml" />
+    	<mapper resource="sqlmap/UserCustomServiceSqlMap.xml" />
+    	<mapper resource="sqlmap/PaymentOrderSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformAttachmentSqlMap.xml" />
+    	<mapper resource="sqlmap/RefProductPromotionSqlMap.xml" />
+    	<mapper resource="sqlmap/UserShoppingCartSqlMap.xml" />
+    	<mapper resource="sqlmap/UserCustomAboutSqlMap.xml" />
+    	<mapper resource="sqlmap/GameInfoSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformAppVersionSqlMap.xml" />
+    	<mapper resource="sqlmap/UserGameVersionSqlMap.xml" />
+    	<mapper resource="sqlmap/UserAddressInfoSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformZoneSqlMap.xml" />
+    	<mapper resource="sqlmap/UserOrderSqlMap.xml" />
+    	<mapper resource="sqlmap/UserOrderItemSqlMap.xml" />
+    	<mapper resource="sqlmap/UserOrderItemVirtualSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformBlockCommentSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformGameAppSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildInfoSqlMap.xml" />
+    	<mapper resource="sqlmap/UserVipGroupSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformAdvertSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildItemsStockSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildNoticeSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildMembersSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildItemSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformDictSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildMemberSigninSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildLevelSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildItemGiveSqlMap.xml" />
+		<mapper resource="sqlmap/GuildItemVirtualSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildMemberDonationSqlMap.xml" />
+    	<mapper resource="sqlmap/UserSessionTokenSqlMap.xml" />
+    	<mapper resource="sqlmap/PlatformFeedbackSqlMap.xml" />
+    	<mapper resource="sqlmap/UserGameSqlMap.xml" />
+    	<mapper resource="sqlmap/UserGameDeductingProcessSqlMap.xml" />
+    	<mapper resource="sqlmap/UserGameAdaptorSqlMap.xml" />
+    	<mapper resource="sqlmap/GuildMemberLevelSqlMap.xml" />
+    	<mapper resource="sqlmap/ArticleSqlMap.xml" />
+		<mapper resource="sqlmap/ChannelSqlMap.xml" />
+		<mapper resource="sqlmap/CommentSqlMap.xml" />
+		<mapper resource="sqlmap/UserSignSqlMap.xml" />
+		<mapper resource="sqlmap/PlatformGameTopicSqlMap.xml" />
+		<mapper resource="sqlmap/PlatformAppIndexImgSqlMap.xml" />
+		<mapper resource="sqlmap/MessagePublishSqlMap.xml" />
+		<mapper resource="sqlmap/MessageReaderSqlMap.xml" />
+		<mapper resource="sqlmap/MessageReaderAttachSqlMap.xml" />
+		<mapper resource="sqlmap/UserCreditsSqlMap.xml" />
+		<mapper resource="sqlmap/PlatformGameAppTrendSqlMap.xml" />
+		<mapper resource="sqlmap/UserCommentSqlMap.xml" />
+		<mapper resource="sqlmap/UserCenterNoticeSqlMap.xml" />
+		<mapper resource="sqlmap/AppLoadimgSqlMap.xml" />
+		<mapper resource="sqlmap/RedPacketInfoSqlMap.xml" />
+		<mapper resource="sqlmap/RedPacketItemSqlMap.xml" />
+		<mapper resource="sqlmap/GuildHistoryMessageSqlMap.xml" />
+    </mappers>
+</configuration>

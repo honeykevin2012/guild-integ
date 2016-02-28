@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserCustomServiceDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id AS id,
+		title AS title,
+		content AS content,
+		user_id AS userId,
+		user_name AS userName,
+		type AS type,
+		email AS email,
+		mobile AS mobile,
+		is_reply AS isReply,
+		user_type AS userType,
+		parent_id AS parentId,
+		game_id AS gameId,
+		game_name AS gameName,
+		game_server_id AS gameServerId,
+		game_server_name AS gameServerName,
+		game_role_name AS gameRoleName,
+		create_time AS createTime FROM user_custom_service
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserCustomService" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.title != null and params.title != ''">
+					and title = #{params.title}
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and content = #{params.content}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.userName != null and params.userName != ''">
+					and user_name = #{params.userName}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and type = #{params.type}
+				</if>
+				<if test="params.email != null and params.email != ''">
+					and email = #{params.email}
+				</if>
+				<if test="params.mobile != null and params.mobile != ''">
+					and mobile = #{params.mobile}
+				</if>
+				<if test="params.isReply != null and params.isReply != ''">
+					and is_reply = #{params.isReply}
+				</if>
+				<if test="params.userType != null and params.userType != ''">
+					and user_type = #{params.userType}
+				</if>
+				<if test="params.parentId != null and params.parentId != ''">
+					and parent_id = #{params.parentId}
+				</if>
+				<if test="params.gameId != null and params.gameId != ''">
+					and game_id = #{params.gameId}
+				</if>
+				<if test="params.gameName != null and params.gameName != ''">
+					and game_name = #{params.gameName}
+				</if>
+				<if test="params.gameServerId != null and params.gameServerId != ''">
+					and game_server_id = #{params.gameServerId}
+				</if>
+				<if test="params.gameServerName != null and params.gameServerName != ''">
+					and game_server_name = #{params.gameServerName}
+				</if>
+				<if test="params.gameRoleName != null and params.gameRoleName != ''">
+					and game_role_name = #{params.gameRoleName}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserCustomService" parameterType="int">
+		SELECT  id AS id, title AS title, content AS content, user_id AS userId, user_name AS userName, type AS type, email AS email, mobile AS mobile, is_reply AS isReply, user_type AS userType, parent_id AS parentId, game_id AS gameId, game_name AS gameName, game_server_id AS gameServerId, game_server_name AS gameServerName, game_role_name AS gameRoleName, create_time AS createTime FROM user_custom_service WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserCustomService" parameterType="com.game.user.domain.UserCustomService">
+		SELECT  id AS id, title AS title, content AS content, user_id AS userId, user_name AS userName, type AS type, email AS email, mobile AS mobile, is_reply AS isReply, user_type AS userType, parent_id AS parentId, game_id AS gameId, game_name AS gameName, game_server_id AS gameServerId, game_server_name AS gameServerName, game_role_name AS gameRoleName, create_time AS createTime FROM user_custom_service
+		<where>
+				<if test="title != null and title != ''">
+					and title = #{title}
+				</if>
+				<if test="content != null and content != ''">
+					and content = #{content}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="userName != null and userName != ''">
+					and user_name = #{userName}
+				</if>
+				<if test="type != null and type != ''">
+					and type = #{type}
+				</if>
+				<if test="email != null and email != ''">
+					and email = #{email}
+				</if>
+				<if test="mobile != null and mobile != ''">
+					and mobile = #{mobile}
+				</if>
+				<if test="isReply != null and isReply != ''">
+					and is_reply = #{isReply}
+				</if>
+				<if test="userType != null and userType != ''">
+					and user_type = #{userType}
+				</if>
+				<if test="parentId != null and parentId != ''">
+					and parent_id = #{parentId}
+				</if>
+				<if test="gameId != null and gameId != ''">
+					and game_id = #{gameId}
+				</if>
+				<if test="gameName != null and gameName != ''">
+					and game_name = #{gameName}
+				</if>
+				<if test="gameServerId != null and gameServerId != ''">
+					and game_server_id = #{gameServerId}
+				</if>
+				<if test="gameServerName != null and gameServerName != ''">
+					and game_server_name = #{gameServerName}
+				</if>
+				<if test="gameRoleName != null and gameRoleName != ''">
+					and game_role_name = #{gameRoleName}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserCustomService" parameterType="int">
+		SELECT  id AS id, title AS title, content AS content, user_id AS userId, user_name AS userName, type AS type, email AS email, mobile AS mobile, is_reply AS isReply, user_type AS userType, parent_id AS parentId, game_id AS gameId, game_name AS gameName, game_server_id AS gameServerId, game_server_name AS gameServerName, game_role_name AS gameRoleName, create_time AS createTime FROM user_custom_service
+	</select>
+	
+	<select id="selectCustomList" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserCustomService" useCache="false">
+		<![CDATA[
+			select u.id, u.content, u.create_time, t.addtion from user_custom_service u left join 
+			(
+				select parent_id, group_concat(concat_ws('####',content, create_time, user_type),'||||') as addtion 
+				from user_custom_service where parent_id <> -1 group by parent_id order by create_time
+			)t 
+			on u.id=t.parent_id  where u.parent_id=-1 and user_name = #{params.userName} order by u.create_time desc
+		]]>
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserCustomService">
+		INSERT INTO user_custom_service
+		(
+		    title, content, user_id, user_name, type, email, mobile, user_type, parent_id, 
+		    game_id, game_name, game_server_id, game_server_name, game_role_name)
+		values 
+		(
+		    #{title} , #{content} , #{userId} , #{userName} , #{type} , #{email} , #{mobile} , 
+		    #{userType} , #{parentId} , #{gameId} , #{gameName} , #{gameServerId} , #{gameServerName} , 
+		    #{gameRoleName}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserCustomService">
+		UPDATE user_custom_service 
+		SET  id=#{id} , title=#{title} , content=#{content} , user_id=#{userId} , user_name=#{userName} , type=#{type} , email=#{email} , mobile=#{mobile} , is_reply=#{isReply} , user_type=#{userType} , parent_id=#{parentId} , game_id=#{gameId} , game_name=#{gameName} , game_server_id=#{gameServerId} , game_server_name=#{gameServerName} , game_role_name=#{gameRoleName} , create_time=#{createTime}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_custom_service WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_custom_service WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

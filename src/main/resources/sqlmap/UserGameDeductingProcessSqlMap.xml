@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserGameDeductingProcessDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		user_id,
+		game_id,
+		cost_amount,
+		exchange_nb_gold,
+		exchange_divide,
+		order_id,
+		status,
+		create_time,
+		request_times,
+		server_id,
+		role_id,
+		faild_message FROM user_game_deducting_process
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserGameDeductingProcess" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.gameId != null and params.gameId != ''">
+					and game_id = #{params.gameId}
+				</if>
+				<if test="params.costAmount != null and params.costAmount != ''">
+					and cost_amount = #{params.costAmount}
+				</if>
+				<if test="params.exchangeNbGold != null and params.exchangeNbGold != ''">
+					and exchange_nb_gold = #{params.exchangeNbGold}
+				</if>
+				<if test="params.exchangeDivide != null and params.exchangeDivide != ''">
+					and exchange_divide = #{params.exchangeDivide}
+				</if>
+				<if test="params.orderId != null and params.orderId != ''">
+					and order_id = #{params.orderId}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and status = #{params.status}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+				<if test="params.requestTimes != null and params.requestTimes != ''">
+					and request_times = #{params.requestTimes}
+				</if>
+				<if test="params.serverId != null and params.serverId != ''">
+					and server_id = #{params.serverId}
+				</if>
+				<if test="params.roleId != null and params.roleId != ''">
+					and role_id = #{params.roleId}
+				</if>
+				<if test="params.faildMessage != null and params.faildMessage != ''">
+					and faild_message = #{params.faildMessage}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserGameDeductingProcess" parameterType="int">
+		SELECT  id, user_id, game_id, cost_amount, exchange_nb_gold, exchange_divide, order_id, status, create_time, request_times, server_id, role_id, faild_message FROM user_game_deducting_process WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserGameDeductingProcess" parameterType="com.game.user.domain.UserGameDeductingProcess">
+		SELECT
+		  p.id,
+		  p.user_id,
+		  p.game_id,
+		  p.cost_amount,
+		  p.exchange_nb_gold,
+		  p.exchange_divide,
+		  p.order_id,
+		  p.status,
+		  p.create_time,
+		  p.request_times,
+		  p.server_id,
+		  p.role_id,
+		  p.faild_message,
+		  u.role_name,
+		  u.server_name,
+		  g.name             AS gameName
+		FROM user_game_deducting_process p
+		  LEFT JOIN user_game u
+		    ON p.game_id = u.game_id
+		      AND p.role_id = u.role_id
+		      AND p.server_id = u.server_id
+		  LEFT JOIN platform_game_app g
+		    ON p.game_id = g.code
+		<where>
+				<if test="id != null and id != ''">
+					and p.id = #{id}
+				</if>
+				<if test="userId != null and userId != ''">
+					and p.user_id = #{userId}
+				</if>
+				<if test="gameId != null and gameId != ''">
+					and p.game_id = #{gameId}
+				</if>
+				<if test="costAmount != null and costAmount != ''">
+					and p.cost_amount = #{costAmount}
+				</if>
+				<if test="exchangeNbGold != null and exchangeNbGold != ''">
+					and p.exchange_nb_gold = #{exchangeNbGold}
+				</if>
+				<if test="exchangeDivide != null and exchangeDivide != ''">
+					and p.exchange_divide = #{exchangeDivide}
+				</if>
+				<if test="orderId != null and orderId != ''">
+					and p.order_id = #{orderId}
+				</if>
+				<if test="status != null and status != ''">
+					and p.status = #{status}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and p.create_time = #{createTime}
+				</if>
+				<if test="requestTimes != null and requestTimes != ''">
+					and p.request_times = #{requestTimes}
+				</if>
+				<if test="serverId != null and serverId != ''">
+					and p.server_id = #{serverId}
+				</if>
+				<if test="roleId != null and roleId != ''">
+					and p.role_id = #{roleId}
+				</if>
+				<if test="faildMessage != null and faildMessage != ''">
+					and p.faild_message = #{faildMessage}
+				</if>
+			</where>
+		ORDER BY p.id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserGameDeductingProcess" parameterType="int">
+		SELECT  id, user_id, game_id, cost_amount, exchange_nb_gold, exchange_divide, order_id, status, create_time, request_times, server_id, role_id, faild_message FROM user_game_deducting_process
+	</select>
+
+	<select id="selectPayFaildList" resultType="com.game.user.domain.UserGameDeductingProcess"  parameterType="com.game.user.domain.UserGameDeductingProcess">
+			SELECT
+	  p.id,
+	  p.user_id,
+	  p.game_id,
+	  p.cost_amount,
+	  p.exchange_nb_gold,
+	  p.exchange_divide,
+	  p.order_id,
+	  p.status,
+	  p.create_time,
+	  p.request_times,
+	  p.server_id,
+	  p.role_id,
+	  p.faild_message,
+	  u.role_name,
+	  u.server_name,
+	  u.gameName,
+	  u.gameIcon
+	FROM user_game_deducting_process p,
+	  (SELECT
+	     ug.*,
+	     g.name              AS gameName,
+	     g.icon as gameIcon
+	   FROM user_game ug
+	     LEFT JOIN platform_game_app g
+	       ON ug.game_id = g.code
+	   WHERE ug.user_id = #{userId}) u
+	WHERE p.game_id = u.game_id
+	    AND p.role_id = u.role_id
+	    AND p.server_id = u.server_id
+	    AND p.status = '-1'
+	    AND p.order_id = #{orderId}
+	</select>
+
+	<select id="selectPaySuccessList" resultType="com.game.user.domain.UserGameDeductingProcess"  parameterType="com.game.user.domain.UserGameDeductingProcess">
+			SELECT
+	  p.id,
+	  p.user_id,
+	  p.game_id,
+	  p.cost_amount,
+	  p.exchange_nb_gold,
+	  p.exchange_divide,
+	  p.order_id,
+	  p.status,
+	  p.create_time,
+	  p.request_times,
+	  p.server_id,
+	  p.role_id,
+	  p.faild_message,
+	  u.role_name,
+	  u.server_name,
+	  u.gameName,
+	   u.gameIcon
+	FROM user_game_deducting_process p,
+	  (SELECT
+	     ug.*,
+	     g.name              AS gameName,
+	     g.icon as gameIcon
+	   FROM user_game ug
+	     LEFT JOIN platform_game_app g
+	       ON ug.game_id = g.code
+	   WHERE ug.user_id = #{userId}) u
+	WHERE p.game_id = u.game_id
+	    AND p.role_id = u.role_id
+	    AND p.server_id = u.server_id
+	    AND p.status = '1'
+	    AND p.order_id = #{orderId}
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserGameDeductingProcess">
+		INSERT INTO user_game_deducting_process
+		(
+		    user_id, game_id, cost_amount, exchange_nb_gold, exchange_divide, order_id, status, create_time, server_id, role_id, faild_message)
+		values 
+		(
+		    #{userId} , #{gameId} , #{costAmount} , #{exchangeNbGold} , #{exchangeDivide} , #{orderId} , #{status} ,now() , #{serverId} , #{roleId} , #{faildMessage} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserGameDeductingProcess">
+		UPDATE user_game_deducting_process 
+		SET  id=#{id} , user_id=#{userId} , game_id=#{gameId} , cost_amount=#{costAmount} , exchange_nb_gold=#{exchangeNbGold} , exchange_divide=#{exchangeDivide} , order_id=#{orderId} , status=#{status} , create_time=#{createTime} , request_times=#{requestTimes} , server_id=#{serverId} , role_id=#{roleId} , faild_message=#{faildMessage}  WHERE id=#{id}
+	</update>
+
+	<update id="updateGameResult" parameterType="com.game.user.domain.UserGameDeductingProcess">
+		UPDATE user_game_deducting_process 
+		SET  status=#{status} ,request_times=request_times+1, faild_message=#{faildMessage}  WHERE id=#{id}
+	</update>
+
+	<update id="updatePayRefund" parameterType="java.lang.String">
+		UPDATE user_game_deducting_process 
+		SET  status=-2   WHERE order_id=#{orderId} and status=1
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_game_deducting_process WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_game_deducting_process WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

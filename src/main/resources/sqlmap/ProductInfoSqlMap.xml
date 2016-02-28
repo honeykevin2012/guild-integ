@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.shop.persistence.dao.ProductInfoDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 
+			p.id AS id,
+			p.name AS name,
+			p.goods_no AS goodsNo,
+			p.price AS price,
+			p.category_id AS categoryId,
+			p.create_time AS createTime,
+			p.up_time AS up_time,
+			p.down_time AS downTime,
+			p.brand AS brand,
+			p.weight AS weight,
+			p.unit AS unit,
+			p.visit_times AS visitTimes,
+			p.sort AS sort,
+			p.comment_times AS comment_times,
+			p.sale_times AS sale_times,
+			p.grade AS grade,
+			p.status AS status,
+			p.type AS type,
+			p.count AS count,
+			p.sale_status AS saleStatus,
+			p.is_virtual as is_virtual,
+			a.path as productPhoto 
+		FROM product_info p left join platform_attachment a on p.id=a.relation_id 
+		and a.channel = #{params.channel} and a.size = #{params.size} and a.is_default = #{params.isDefault}
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.shop.domain.ProductInfo">
+		select * from(
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and p.id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and p.name like CONCAT('%','${params.name}','%' )  
+				</if>
+				<if test="params.goodsNo != null and params.goodsNo != ''">
+					and p.goods_no = #{params.goodsNo}
+				</if>
+				<if test="params.price != null and params.price != ''">
+					and p.price = #{params.price}
+				</if>
+				<if test="params.categoryId != null and params.categoryId != ''">
+					and p.category_id = #{params.categoryId}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and p.create_time = #{params.createTime}
+				</if>
+				<if test="params.upTime != null and params.upTime != ''">
+					and p.up_time = #{params.upTime}
+				</if>
+				<if test="params.downTime != null and params.downTime != ''">
+					and p.down_time = #{params.downTime}
+				</if>
+				<if test="params.brand != null and params.brand != ''">
+					and p.brand = #{params.brand}
+				</if>
+				<if test="params.weight != null and params.weight != ''">
+					and p.weight = #{params.weight}
+				</if>
+				<if test="params.unit != null and params.unit != ''">
+					and p.unit = #{params.unit}
+				</if>
+				<if test="params.visitTimes != null and params.visitTimes != ''">
+					and p.visit_times = #{params.visitTimes}
+				</if>
+				<if test="params.sort != null and params.sort != ''">
+					and p.sort = #{params.sort}
+				</if>
+				<if test="params.commentTimes != null and params.commentTimes != ''">
+					and p.comment_times = #{params.commentTimes}
+				</if>
+				<if test="params.saleTimes != null and params.saleTimes != ''">
+					and p.sale_times = #{params.saleTimes}
+				</if>
+				<if test="params.grade != null and params.grade != ''">
+					and p.grade = #{params.grade}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and p.status = #{params.status}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and p.type = #{params.type}
+				</if>
+			</where>
+		)t1 
+		left join 
+	    (
+	      select item.product_id, max(item.create_time) as order_create_time , case when u.nick_name is null then u.user_name else u.nick_name end as exchange_user_name,  item.product_name 
+	      from user_order o, user_order_item item , user u where item.order_id=o.order_id and o.user_id=u.id group by item.product_id
+	    ) t2 on t1.id=t2.product_id
+	    order by ${orderBy} 
+	</select>
+	
+	<resultMap id="productResultMap" type="com.game.shop.domain.ProductInfo">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="goodsNo" column="goods_no" />
+       	<result property="price" column="price" />
+        <result property="categoryId" column="category_id" />
+        <result property="createTime" column="create_time" />
+        <result property="upTime" column="up_time" />
+        <result property="downTime" column="down_time" />
+        <result property="brand" column="brand" />
+        <result property="weight" column="weight" />
+        <result property="unit" column="unit" />
+        <result property="visitTimes" column="visit_times" />
+        <result property="sort" column="sort" />
+        <result property="commentTimes" column="comment_times" />
+        <result property="saleTimes" column="sale_times" />
+        <result property="grade" column="grade" />
+        <result property="status" column="status" />
+        <result property="type" column="type" />
+        <result property="count" column="count" />
+        <result property="saleStatus" column="sale_status" />
+        <result property="productPhoto" column="product_photo" />
+        <result property="remark" column="remark" />
+        <result property="isVirtual" column="is_virtual" />
+        <collection property="images" ofType="com.game.platform.domain.PlatformAttachment">
+        	<id property="id" column="attach_id" />
+        	<id property="fileName" column="attach_file_name" />
+        	<id property="path" column="attach_path" />
+        	<id property="size" column="attach_size" />
+        	<id property="isDefault" column="attach_is_default" />
+        </collection>
+        <collection property="exclusive" ofType="com.game.platform.domain.PlatformGameApp">
+        	<id property="id" column="game_id" />
+        	<id property="code" column="game_code" />
+        	<id property="name" column="game_name" />
+        	<id property="icon" column="game_icon" />
+        	<id property="commend" column="game_commend" />
+        	<id property="sitePageUrl" column="site_page_url" />
+        	<id property="downloadTimes" column="download_times" />
+        	<id property="packageSize" column="package_size" />
+        </collection>
+    </resultMap>
+	<select id="select" resultMap="productResultMap" parameterType="int" useCache="true">
+		SELECT 
+			p.id AS id, p.name AS name, p.goods_no AS goods_no, p.price AS price, p.category_id AS category_id,
+			p.create_time AS create_time, p.up_time AS up_time, p.down_time AS down_time, p.brand AS brand, p.weight AS weight,
+			p.unit AS unit, p.visit_times AS visit_times, p.sort AS sort, p.comment_times AS comment_times, p.sale_times AS sale_times,
+			p.grade AS grade, p.status AS status, p.type AS type, p.count AS count, p.sale_status AS sale_status, p.is_virtual as is_virtual,
+      		case when a.is_default=1 then a.path else null end as product_photo, p.remark as remark,
+      		a.id as attach_id, a.file_name as attach_file_name, a.path as attach_path, a.size as attach_size, a.is_default as attach_is_default,
+	      	g.id AS game_id, g.code AS game_code, g.name AS game_name, g.icon AS game_icon, g.commend as game_commend, g.remark AS game_remark, 
+			g.site_page_url as site_page_url, g.download_times as download_times, g.type,package_size as package_size
+		FROM product_info p left join platform_attachment a on p.id=a.relation_id and a.channel = '1000' and a.size = '350350'  
+    	left join ref_product_game r on p.id=r.product_id left join platform_game_app g on r.game_id=g.id
+    	where p.id=#{id}
+	</select>
+
+	<select id="selectHotList" resultType="com.game.shop.domain.ProductInfo" >
+		<![CDATA[
+			SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+			p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, 
+			p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+			p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+			p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+			FROM product_info p
+			left join platform_attachment a on p.id=a.relation_id 
+			and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+			WHERE p.status=1 and p.sort>0 ORDER BY p.sort desc limit 10
+		]]>
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.shop.domain.ProductInfo" parameterType="com.game.shop.domain.ProductInfo">
+		SELECT  id AS id, sale_status AS saleStatus, count AS count, name AS name, goods_no AS goodsNo, price AS price, 
+		category_id AS categoryId, create_time AS createTime, up_time AS upTime, down_time AS downTime, 
+		brand AS brand, weight AS weight, unit AS unit, visit_times AS visitTimes, sort AS sort, is_virtual,
+		comment_times AS commentTimes, sale_times AS saleTimes, grade AS grade, status AS status, type AS type 
+		FROM product_info
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and name = #{name}
+				</if>
+				<if test="goodsNo != null and goodsNo != ''">
+					and goods_no = #{goodsNo}
+				</if>
+				<if test="price != null and price != ''">
+					and price = #{price}
+				</if>
+				<if test="categoryId != null and categoryId != ''">
+					and category_id = #{categoryId}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="upTime != null and upTime != ''">
+					and up_time = #{upTime}
+				</if>
+				<if test="downTime != null and downTime != ''">
+					and down_time = #{downTime}
+				</if>
+				<if test="brand != null and brand != ''">
+					and brand = #{brand}
+				</if>
+				<if test="weight != null and weight != ''">
+					and weight = #{weight}
+				</if>
+				<if test="unit != null and unit != ''">
+					and unit = #{unit}
+				</if>
+				<if test="visitTimes != null and visitTimes != ''">
+					and visit_times = #{visitTimes}
+				</if>
+				<if test="sort != null and sort != ''">
+					and sort = #{sort}
+				</if>
+				<if test="commentTimes != null and commentTimes != ''">
+					and comment_times = #{commentTimes}
+				</if>
+				<if test="saleTimes != null and saleTimes != ''">
+					and sale_times = #{saleTimes}
+				</if>
+				<if test="grade != null and grade != ''">
+					and grade = #{grade}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+				<if test="type != null and type != ''">
+					and type = #{type}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectEntityByIds" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+		SELECT  p.id AS id, p.sale_status AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+		p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, p.is_virtual as is_virtual,
+		p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, p.version as version,
+		p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+		p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+		FROM product_info p
+		left join platform_attachment a on p.id=a.relation_id 
+		and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+		WHERE p.id in 
+		<foreach collection="ids" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		ORDER BY p.id DESC 
+	</select>
+	
+	<select id="selectEntityByProductIds" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+		SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+		p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, p.is_virtual as is_virtual,
+		p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+		p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+		p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+		FROM product_info p
+		left join platform_attachment a on p.id=a.relation_id 
+		and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+		WHERE p.id in 
+		<foreach collection="pids" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		ORDER BY p.id DESC 
+	</select>
+	
+	<select id="selectProductById" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+		SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+		p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, p.is_virtual as is_virtual,
+		p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+		p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+		p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+		FROM product_info p
+		left join platform_attachment a on p.id=a.relation_id 
+		and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+		WHERE p.id = #{id} 
+		ORDER BY p.id DESC 
+	</select>
+	
+	<!-- 查询用户NB可兑换的商品 -->
+	<select id="selectUserExchangeItems" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+		<![CDATA[
+			SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+			p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, p.is_virtual as is_virtual,
+			p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+			p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+			p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+			FROM product_info p
+			left join platform_attachment a on p.id=a.relation_id 
+			and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+			WHERE p.status=1 and p.price <= #{platAmount} ORDER BY p.price asc 
+		]]>
+	</select>
+	
+	<!-- 查询模板下的商品 -->
+	<select id="selectProductByIds" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+			SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+			p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, 
+			p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+			p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+			p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, a.path as productPhoto
+			FROM product_info p
+			left join platform_attachment a on p.id=a.relation_id 
+			and a.channel = #{channel} and a.is_default = #{isDefault} and a.size = #{picsize} 
+			WHERE p.id IN
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach> 
+		ORDER BY p.price asc limit 20
+
+	</select>
+	
+	<select id="selectEntityByCart" resultType="com.game.shop.domain.ProductInfo" parameterType="map">
+		SELECT  p.id AS id,p.sale_status   AS saleStatus, p.count AS count, p.name AS name, p.goods_no AS goodsNo, 
+			p.price AS price, p.category_id AS categoryId, p.create_time AS createTime, p.is_virtual as is_virtual,
+			p.up_time AS upTime, p.down_time AS downTime, p.brand AS brand, p.weight AS weight, 
+			p.unit AS unit, p.visit_times AS visitTimes, p.sort AS sort, p.comment_times AS commentTimes, 
+			p.sale_times AS saleTimes, p.grade AS grade, p.status AS status, p.type AS type, p.version AS version,
+			a.path as productPhoto, c.count as cartCount 
+		FROM product_info p
+		left join platform_attachment a 
+	   		on p.id=a.relation_id 
+			and a.channel = #{channel} 
+			and a.is_default = #{isDefault} 
+			and a.size = #{picsize} 
+	    left join user_shopping_cart c 
+	    	on p.id=c.product_id 
+		WHERE c.user_id=#{userId}
+				<if test="productIds != null">
+					and p.id in
+					<foreach collection="productIds" item="item" open="(" separator="," close=")">
+						#{item}
+					</foreach>
+				</if>
+		ORDER BY c.create_time DESC 
+	</select>
+	
+	<select id="selectEntityByOrderPaid" resultType="com.game.shop.domain.ProductInfo" parameterType="com.game.common.basics.pagination.PageQuery">
+SELECT
+  p.id            AS id,
+  p.sale_status   AS saleStatus,
+  p.count         AS COUNT,
+  p.name          AS NAME,
+  p.goods_no      AS goodsNo,
+  p.price         AS price,
+  p.category_id   AS categoryId,
+  p.create_time   AS createTime,
+  p.up_time       AS upTime,
+  p.down_time     AS downTime,
+  p.brand         AS brand,
+  p.weight        AS weight,
+  p.unit          AS unit,
+  p.visit_times   AS visitTimes,
+  p.sort          AS sort,
+  p.comment_times AS commentTimes,
+  p.sale_times    AS saleTimes,
+  p.grade         AS grade,
+  p.status        AS STATUS,
+  p.type          AS TYPE,
+  p.is_virtual    AS is_virtual,
+  a.path          AS productPhoto,
+  s.count         AS cartCount,
+  s.address,
+  s.acceptName
+FROM product_info p
+  LEFT JOIN platform_attachment a
+    ON p.id = a.relation_id
+      AND a.channel = #{params.channel}
+      AND a.is_default = #{params.isDefault} 
+      AND a.size = #{params.picsize}
+  RIGHT JOIN (SELECT
+               i.product_id,
+               i.count,
+               o.create_time,
+               sub.address,
+               sub.acceptName
+             FROM user_order_item i
+               LEFT JOIN user_order o
+                 ON i.order_id = o.order_id
+               LEFT JOIN (SELECT
+                            a.id,
+                            CONCAT(p.name,c.name,za.name,a.address) AS address,
+                            a.accept_name     AS acceptName
+                          FROM user_address_info a
+                            LEFT JOIN platform_zone_province p
+                              ON a.province = p.code
+                            LEFT JOIN platform_zone_city c
+                              ON a.city = c.code
+                            LEFT JOIN platform_zone_area za
+                              ON a.area = za.code) sub
+                 ON o.address_id = sub.id
+             WHERE o.user_id = #{params.userId}) s
+    ON p.id = s.product_id
+ORDER BY s.create_time DESC
+	</select>	
+	
+	<select id="selectAll" resultType="com.game.shop.domain.ProductInfo" parameterType="int">
+		SELECT  id AS id, p.sale_status AS saleStatus, count AS count, name AS name, goods_no AS goodsNo, price AS price, category_id AS categoryId, create_time AS createTime, up_time AS upTime, down_time AS downTime, brand AS brand, weight AS weight, unit AS unit, visit_times AS visitTimes, sort AS sort, comment_times AS commentTimes, sale_times AS saleTimes, grade AS grade, status AS status, type AS type FROM product_info
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.shop.domain.ProductInfo">
+		INSERT INTO product_info
+		(
+		    name, count, goods_no, price, category_id, create_time, up_time, down_time, brand, weight, unit, visit_times, sort, comment_times, sale_times, grade, status, type)
+		values 
+		(
+		    #{name} , #{count}, #{goodsNo} , #{price} , #{categoryId} , #{createTime} , #{upTime} , #{downTime} , #{brand} , #{weight} , #{unit} , #{visitTimes} , #{sort} , #{commentTimes} , #{saleTimes} , #{grade} , #{status} , #{type} 
+		)
+	</insert>
+
+	<update id="updateStock" parameterType="com.game.shop.domain.ProductInfo">
+		UPDATE product_info 
+		SET  count=#{count}, sale_times=#{saleTimes}, version=version+1 
+		where id=#{id} and version=#{version}
+	</update>
+	
+	<update id="update" parameterType="com.game.shop.domain.ProductInfo">
+		UPDATE product_info 
+		SET  id=#{id} , name=#{name} ,count=#{count}, goods_no=#{goodsNo} , price=#{price} , 
+		category_id=#{categoryId} , create_time=#{createTime} , up_time=#{upTime} , down_time=#{downTime} , 
+		brand=#{brand} , weight=#{weight} , unit=#{unit} , visit_times=#{visitTimes} , sort=#{sort} , 
+		comment_times=#{commentTimes} , sale_times=#{saleTimes} , grade=#{grade} , status=#{status} , 
+		type=#{type}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM product_info WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM product_info WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

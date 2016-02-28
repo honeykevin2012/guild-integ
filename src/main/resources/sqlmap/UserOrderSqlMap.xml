@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.user.persistence.dao.UserOrderDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id AS id,
+		order_id AS orderId,
+		create_time AS createTime,
+		pay_time AS payTime,
+		status AS status,
+		type AS type,
+		delivery_id AS deliveryId,
+		pay_channel_id AS payChannelId,
+		user_id AS userId,
+		total_amount AS totalAmount,
+		pay_amount AS payAmount,
+		discount_amount AS discountAmount,
+		is_cost_delivery AS isCostDelivery,
+		delivery_amount AS deliveryAmount,
+		address_id AS addressId,
+		ip AS ip,
+		resource AS resource FROM user_order
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.user.domain.UserOrder" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.orderId != null and params.orderId != ''">
+					and order_id = #{params.orderId}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+				<if test="params.payTime != null and params.payTime != ''">
+					and pay_time = #{params.payTime}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and status = #{params.status}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and type = #{params.type}
+				</if>
+				<if test="params.deliveryId != null and params.deliveryId != ''">
+					and delivery_id = #{params.deliveryId}
+				</if>
+				<if test="params.payChannelId != null and params.payChannelId != ''">
+					and pay_channel_id = #{params.payChannelId}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.totalAmount != null and params.totalAmount != ''">
+					and total_amount = #{params.totalAmount}
+				</if>
+				<if test="params.payAmount != null and params.payAmount != ''">
+					and pay_amount = #{params.payAmount}
+				</if>
+				<if test="params.discountAmount != null and params.discountAmount != ''">
+					and discount_amount = #{params.discountAmount}
+				</if>
+				<if test="params.isCostDelivery != null and params.isCostDelivery != ''">
+					and is_cost_delivery = #{params.isCostDelivery}
+				</if>
+				<if test="params.deliveryAmount != null and params.deliveryAmount != ''">
+					and delivery_amount = #{params.deliveryAmount}
+				</if>
+				<if test="params.addressId != null and params.addressId != ''">
+					and address_id = #{params.addressId}
+				</if>
+				<if test="params.ip != null and params.ip != ''">
+					and ip = #{params.ip}
+				</if>
+				<if test="params.resource != null and params.resource != ''">
+					and resource = #{params.resource}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.user.domain.UserOrder" parameterType="int">
+		SELECT  id AS id, order_id AS orderId, create_time AS createTime, pay_time AS payTime, status AS status, type AS type, delivery_id AS deliveryId, pay_channel_id AS payChannelId, user_id AS userId, total_amount AS totalAmount, pay_amount AS payAmount, discount_amount AS discountAmount, is_cost_delivery AS isCostDelivery, delivery_amount AS deliveryAmount, address_id AS addressId, ip AS ip, resource AS resource FROM user_order WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.user.domain.UserOrder" parameterType="com.game.user.domain.UserOrder">
+		SELECT  id AS id, order_id AS orderId, create_time AS createTime, pay_time AS payTime, status AS status, type AS type, delivery_id AS deliveryId, pay_channel_id AS payChannelId, user_id AS userId, total_amount AS totalAmount, pay_amount AS payAmount, discount_amount AS discountAmount, is_cost_delivery AS isCostDelivery, delivery_amount AS deliveryAmount, address_id AS addressId, ip AS ip, resource AS resource FROM user_order
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="orderId != null and orderId != ''">
+					and order_id = #{orderId}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="payTime != null and payTime != ''">
+					and pay_time = #{payTime}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+				<if test="type != null and type != ''">
+					and type = #{type}
+				</if>
+				<if test="deliveryId != null and deliveryId != ''">
+					and delivery_id = #{deliveryId}
+				</if>
+				<if test="payChannelId != null and payChannelId != ''">
+					and pay_channel_id = #{payChannelId}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="totalAmount != null and totalAmount != ''">
+					and total_amount = #{totalAmount}
+				</if>
+				<if test="payAmount != null and payAmount != ''">
+					and pay_amount = #{payAmount}
+				</if>
+				<if test="discountAmount != null and discountAmount != ''">
+					and discount_amount = #{discountAmount}
+				</if>
+				<if test="isCostDelivery != null and isCostDelivery != ''">
+					and is_cost_delivery = #{isCostDelivery}
+				</if>
+				<if test="deliveryAmount != null and deliveryAmount != ''">
+					and delivery_amount = #{deliveryAmount}
+				</if>
+				<if test="addressId != null and addressId != ''">
+					and address_id = #{addressId}
+				</if>
+				<if test="ip != null and ip != ''">
+					and ip = #{ip}
+				</if>
+				<if test="resource != null and resource != ''">
+					and resource = #{resource}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.user.domain.UserOrder" parameterType="int">
+		SELECT  id AS id, order_id AS orderId, create_time AS createTime, pay_time AS payTime, status AS status, type AS type, delivery_id AS deliveryId, pay_channel_id AS payChannelId, user_id AS userId, total_amount AS totalAmount, pay_amount AS payAmount, discount_amount AS discountAmount, is_cost_delivery AS isCostDelivery, delivery_amount AS deliveryAmount, address_id AS addressId, ip AS ip, resource AS resource FROM user_order
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.user.domain.UserOrder">
+		INSERT INTO user_order
+		(
+		    order_id, pay_time, status, type, delivery_id, pay_channel_id, user_id, total_amount, pay_amount, wallet_pay_amount,
+		    discount_amount, is_cost_delivery, delivery_amount, address_id, ip, resource, product_order_type, guild_id)
+		values 
+		(
+		    #{orderId} , #{payTime} , #{status} , #{type} , #{deliveryId} , #{payChannelId} , 
+		    #{userId} , #{totalAmount} , #{payAmount} , #{walletPayAmount}, #{discountAmount} , #{isCostDelivery} , #{deliveryAmount} , #{addressId} , #{ip} , #{resource}, #{productOrderType}, #{guildId} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.user.domain.UserOrder">
+		UPDATE user_order 
+		SET 
+			id=#{id} , order_id=#{orderId} , create_time=#{createTime} , pay_time=#{payTime} , status=#{status} , 
+			type=#{type} , delivery_id=#{deliveryId} , pay_channel_id=#{payChannelId} , user_id=#{userId} , 
+			total_amount=#{totalAmount} , pay_amount=#{payAmount} , discount_amount=#{discountAmount} , 
+			is_cost_delivery=#{isCostDelivery} , delivery_amount=#{deliveryAmount} , address_id=#{addressId} , 
+			ip=#{ip} , resource=#{resource}, product_order_type=#{productOrderType}
+		WHERE id=#{id}
+	</update>
+
+	<update id="updateRepayStatus" parameterType="java.lang.String">
+		UPDATE user_order 
+		SET  status=0   WHERE order_id=#{orderId} and status=-1
+	</update>
+	
+	<update id="updateRefundStatus" parameterType="com.game.user.domain.UserOrder">
+		UPDATE user_order 
+		SET  status=-2   WHERE order_id=#{orderId} and user_id=#{userId}
+	</update>
+	<update id="updateDeliverStatus" parameterType="com.game.user.domain.UserOrder">
+		UPDATE user_order 
+		SET  address_id =#{addressId}  WHERE order_id=#{orderId} and user_id=#{userId}
+	</update>	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_order WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_order WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<select id="selectSumAmount" resultType="long" parameterType="int">
+		SELECT SUM(total_amount) AS total FROM user_order WHERE user_id=#{userId} AND STATUS=1
+	</select>
+
+	<select id="selectOrderRemain" resultType="long" parameterType="java.lang.String">
+		SELECT
+		    (CASE WHEN ISNULL(p.paid) THEN o.total_amount ELSE o.total_amount - p.paid END) AS remain
+		FROM user_order o
+		  LEFT JOIN (SELECT
+		               p.order_id,
+		               SUM(exchange_nb_gold) AS paid
+		             FROM user_game_deducting_process p
+		             WHERE p.order_id =#{orderId}
+		                 AND p.status = 1) p
+		    ON o.order_id = p.order_id
+		WHERE o.order_id = #{orderId}
+	</select>
+	
+	<select id="selectUserOrdersComplete" parameterType="com.game.common.basics.pagination.PageQuery" resultType="map" >
+
+<![CDATA[
+SELECT
+  ta.*
+FROM (SELECT
+        o.product_order_type AS order_type,
+        o.order_id           AS orderId,
+        o.pay_amount         AS payAmount,
+        s.address,
+        s.acceptName,
+        o.status             AS status,
+        (CASE WHEN (p.is_virtual<>1 AND o.address_id= 0 AND (o.status=0 OR o.status=1)) THEN 0 ELSE 1 END) AS deliver,
+        p.items,
+        o.create_time,
+        o.guild_id,
+        g.name               AS guildName
+      FROM user_order o
+        LEFT JOIN (SELECT
+                     a.id,
+                     CONCAT(IFNULL(p.name,''),IFNULL(c.name,''),IFNULL(za.name,''),IFNULL(a.address,'')) AS address,
+                     a.accept_name         AS acceptName
+                   FROM user_address_info a
+                     LEFT JOIN platform_zone_province p
+                       ON a.province = p.code
+                     LEFT JOIN platform_zone_city c
+                       ON a.city = c.code
+                     LEFT JOIN platform_zone_area za
+                       ON a.area = za.code) s
+          ON o.address_id = s.id
+        LEFT JOIN (SELECT
+                     order_id,
+                     i.is_virtual,
+                     GROUP_CONCAT(CONCAT(product_id,'!@',product_name,'!@',COALESCE(a.path,''),'!@',i.product_price,'!@',i.count, '!@',(CASE WHEN (i.is_virtual IS NULL OR i.is_virtual=-1) THEN 0 ELSE 1 END)) SEPARATOR '#$') AS items
+                   FROM user_order_item i
+                     LEFT JOIN platform_attachment a
+                       ON i.product_id = a.relation_id
+                         AND a.channel = 1000
+                         AND a.is_default = 1
+                         AND a.size = 200200
+                   GROUP BY i.order_id) p
+          ON o.order_id = p.order_id
+        LEFT JOIN guild_info g
+          ON o.guild_id = g.id
+      WHERE user_id = #{params.userId}
+          AND (o.product_order_type = 1
+                OR o.product_order_type = 3)
+          AND o.status >  - 1) ta
+ORDER BY ta.create_time DESC
+		]]>
+	</select>
+
+	<select id="selectVirtualItem" parameterType="com.game.user.domain.UserOrder" resultType="map" >
+		SELECT
+		  3                 AS order_type,
+		  iv.id             AS orderId,
+		  0                 AS payAmount,
+		  i.guild_name      AS address,
+		  1                 AS acceptName,
+		  1                 AS STATUS,
+		  1                 AS deliver,
+		  CONCAT('xx','!@',i.game_name,'-',i.name,'-',i.remark,'-',uac.code,'!@','xx') AS items,
+		  iv.give_item_time AS createTime,
+		  '-1'              AS guild_id,
+		  ''                AS guildName
+		FROM guild_item_virtual iv
+		  LEFT JOIN (SELECT
+		               gi.id,
+		               gi.name,
+		               gi.is_virtual,
+		               act.remark,
+		               gif.name           AS guild_name,
+		               ga.name            AS game_name
+		             FROM guild_item gi
+		               LEFT JOIN user_active_code_type act
+		                 ON gi.type_id = act.id
+		               LEFT JOIN platform_game_app ga
+		                 ON act.game_id = ga.id
+		               LEFT JOIN guild_info gif
+		                 ON gi.guild_id = gif.id
+		             WHERE gi.is_virtual = 1) i
+		    ON iv.item_id = i.id
+		  LEFT JOIN user_active_code uac
+		    ON iv.code_id = uac.Id
+		WHERE iv.status = '3'
+		    AND iv.user_id = #{userId}
+		    AND iv.id = #{orderId}
+	</select>
+	
+	<select id="selectUserOrdersFaild" parameterType="com.game.common.basics.pagination.PageQuery" resultType="map" >
+			SELECT
+			1 AS order_type,
+			  o.order_id   AS orderId,
+			  o.pay_amount AS payAmount,
+			  s.address,
+			  s.acceptName,
+			  o.status AS status,
+			  0 AS deliver,
+			  p.items
+			FROM user_order o
+			  LEFT JOIN (SELECT
+			               a.id,
+			               CONCAT(IFNULL(p.name,''),IFNULL(c.name,''),IFNULL(za.name,''),IFNULL(a.address,''))  AS address,
+			               a.accept_name AS acceptName
+			             FROM user_address_info a
+			               LEFT JOIN platform_zone_province p
+			                 ON a.province = p.code
+			               LEFT JOIN platform_zone_city c
+			                 ON a.city = c.code
+			               LEFT JOIN platform_zone_area za
+			                 ON a.area = za.code) s
+			    ON o.address_id = s.id
+			    LEFT JOIN (SELECT
+                     order_id,
+                     GROUP_CONCAT(CONCAT(product_id,'!@',product_name,'!@',COALESCE(a.path,''),'!@',i.product_price,'!@',i.count,'!@',(case when (i.is_virtual is null or i.is_virtual=-1) then 0 else 1 end)) SEPARATOR '#$') AS items
+                   FROM user_order_item i
+                     LEFT JOIN platform_attachment a
+                       ON i.product_id = a.relation_id
+                         AND a.channel = 1000
+                         AND a.is_default = 1
+                         AND a.size = 200200
+                   GROUP BY i.order_id) p ON o.order_id=p.order_id
+			WHERE user_id = #{params.userId} and o.status =-1
+			ORDER BY o.id DESC 
+	</select>
+	<select id="selectByOrderId" parameterType="com.game.user.domain.UserOrder" resultType="map" >
+		SELECT
+		  o.order_id   AS orderId,
+		  o.user_id as userId,
+		  o.pay_amount AS payAmount,
+		  DATE_FORMAT(o.create_time,'%Y-%m-%d') AS createTime,
+		  s.address,
+		  s.acceptName,
+		  s.mobile,
+		  (CASE o.status WHEN 0 THEN '处理中' WHEN 1 THEN '已付款' ELSE '支付失败' END) AS status,
+		  o.status as statusCode
+		FROM user_order o
+		  LEFT JOIN (SELECT
+		               a.id,
+		               a.mobile,
+		               CONCAT(IFNULL(p.name,''),IFNULL(c.name,''),IFNULL(za.name,''),IFNULL(a.address,''))  AS address,
+		               a.accept_name AS acceptName
+		             FROM user_address_info a
+		               LEFT JOIN platform_zone_province p
+		                 ON a.province = p.code
+		               LEFT JOIN platform_zone_city c
+		                 ON a.city = c.code
+		               LEFT JOIN platform_zone_area za
+		                 ON a.area = za.code) s
+		    ON o.address_id = s.id
+		<where> 
+			<if test="orderId != null and orderId != ''">
+			and order_id = #{orderId}
+			</if>
+			<if test="userId != null and userId != ''">
+			and user_id = #{userId}
+			</if>
+		</where>		
+		ORDER BY o.id DESC 
+	</select>		
+</mapper>

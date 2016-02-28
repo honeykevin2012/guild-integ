@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.PlatformZoneDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	
+	
+	<select id="selectZoneProvince" resultType="com.game.platform.domain.PlatformZone" parameterType="int">
+		select * from platform_zone_province order by id
+	</select>
+	
+	<select id="selectZoneCity" resultType="com.game.platform.domain.PlatformZone" parameterType="int">
+		select 
+			p.*, group_concat(concat_ws('|',c.code, c.name)) as zone_names 
+		from platform_zone_province p, platform_zone_city c
+		where 
+			c.parent_id=p.code and p.code=#{code} group by p.code
+	</select>
+	
+	<select id="selectZoneArea" resultType="com.game.platform.domain.PlatformZone" parameterType="int">
+		select 
+			c.*, group_concat(concat_ws('|',a.code, a.name)) as zone_names 
+		from platform_zone_city c, platform_zone_area a
+		where 
+			a.parent_id=c.code and c.code=#{code} group by c.code
+	</select>
+</mapper>

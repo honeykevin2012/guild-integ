@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="guildMemberSigninDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildMemberSigninDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="guildLevelDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildLevelDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="guildMemberDonationDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildMemberDonationDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+   
+    <bean id="guildItemsStockDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildItemsStockDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean id="guildNoticeDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildNoticeDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="guildMembersDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildMembersDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="guildItemDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildItemDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="guildItemGiveDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildItemGiveDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="guildItemVirtualDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.guild.persistence.dao.GuildItemVirtualDao" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean> 
+    
+	<bean id="guildInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildInfoDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="guildMemberLevelDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildMemberLevelDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="redPacketInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.RedPacketInfoDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean> 
+	
+	<bean id="redPacketItemDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.RedPacketItemDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean> 
+	<bean id="guildHistoryMessageDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.guild.persistence.dao.GuildHistoryMessageDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+</beans>

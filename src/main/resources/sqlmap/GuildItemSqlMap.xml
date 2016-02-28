@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.guild.persistence.dao.GuildItemDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		select 
+		i.id as id, 
+		i.name as name, 
+		i.status as status, 
+		i.is_virtual as is_virtual, 
+		i.guild_id as guild_id, 
+		i.type_id as type_id, 
+		a.path as product_photo, 
+		sum(count) as count,
+		i.gived_quantity as gived_quantity
+		from guild_item i 
+		left join platform_attachment a on i.type_id=a.relation_id 
+		and a.channel = 1000 and a.is_default = 1 and a.size = 200200
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.guild.domain.GuildItem" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and i.id = #{params.id}
+				</if>
+				<if test="params.name != null and params.name != ''">
+					and i.name = #{params.name}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and i.status = #{params.status}
+				</if>
+				<if test="params.isVirtual != null and params.isVirtual != ''">
+					and i.is_virtual = #{params.isVirtual}
+				</if>
+				<if test="params.guildId != null and params.guildId != ''">
+					and i.guild_id = #{params.guildId}
+				</if>
+				<if test="params.count != null and params.count != ''">
+					and i.count = #{params.count}
+				</if>
+				<if test="params.typeId != null and params.typeId != ''">
+					and i.type_id = #{params.typeId}
+				</if>
+			</where>
+		group by i.type_id order by count desc, gived_quantity desc
+	</select>
+	
+	<select id="select" resultType="com.game.guild.domain.GuildItem" parameterType="int">
+		<include refid="commonSelect"/>
+		where i.id=#{id}
+		group by i.type_id order by count desc, gived_quantity desc
+	</select>
+	
+	<select id="selectByTypeId" resultType="com.game.guild.domain.GuildItem" parameterType="map">
+		select 
+		i.id as id, 
+		i.name as name, 
+		i.status as status, 
+		i.is_virtual as is_virtual, 
+		i.guild_id as guild_id, 
+		i.type_id as type_id, 
+		a.path as product_photo, 
+		i.count as count,
+		i.gived_quantity as gived_quantity
+		from guild_item i 
+		left join platform_attachment a on i.type_id=a.relation_id 
+		and a.channel = 1000 and a.is_default = 1 and a.size = 200200
+		where i.type_id=#{typeId} and i.guild_id=#{guildId}
+		order by count desc, gived_quantity desc
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.guild.domain.GuildItem" parameterType="com.game.guild.domain.GuildItem">
+		select 
+		i.id as id, 
+		i.name as name, 
+		i.status as status, 
+		i.is_virtual as is_virtual, 
+		i.guild_id as guild_id, 
+		i.type_id as type_id, 
+		a.path as product_photo, 
+		sum(count) as count,
+		i.gived_quantity as gived_quantity
+		from guild_item i 
+		left join platform_attachment a on i.type_id=a.relation_id 
+		and a.channel = 1000 and a.is_default = 1 and a.size = 200200
+		<where>
+				<if test="id != null and id != ''">
+					and i.id = #{id}
+				</if>
+				<if test="name != null and name != ''">
+					and i.name = #{name}
+				</if>
+				<if test="status != null and status != ''">
+					and i.status = #{status}
+				</if>
+				<if test="isVirtual != null and isVirtual != ''">
+					and i.is_virtual = #{isVirtual}
+				</if>
+				<if test="guildId != null and guildId != ''">
+					and i.guild_id = #{guildId}
+				</if>
+				<if test="count != null and count != ''">
+					and i.count = #{count}
+				</if>
+				<if test="typeId != null and typeId != ''">
+					and i.type_id = #{typeId}
+				</if>
+			</where>
+		group by i.type_id order by count desc, gived_quantity desc
+	</select>
+	
+	<select id="selectAll" resultType="com.game.guild.domain.GuildItem" parameterType="int">
+		SELECT  id, name, status, is_virtual, guild_id, count, type_id FROM guild_item
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.guild.domain.GuildItem">
+		INSERT INTO guild_item
+		(
+		    name,  is_virtual, guild_id, count, type_id, gived_quantity
+		)
+		values 
+		(
+		    #{name} , #{isVirtual} , #{guildId} , #{count} , #{typeId}, #{givedQuantity}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.guild.domain.GuildItem">
+		UPDATE guild_item 
+		SET  
+			name=#{name} , status=#{status} , is_virtual=#{isVirtual} , 
+			guild_id=#{guildId} , count=#{count} , type_id=#{typeId}, gived_quantity=#{givedQuantity}
+		WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM guild_item WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteByTypeId" parameterType="map">
+		<![CDATA[
+			DELETE FROM guild_item WHERE type_id=#{typeId} and guild_id=#{guildId}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM guild_item WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

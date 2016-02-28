@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.news.persistence.dao.ArticleDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		a.id AS id,
+		a.title AS title,
+		a.intro AS intro,
+		a.create_time AS createTime,
+		a.cover_img AS coverImg
+		 FROM zst_article a 
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.news.domain.Article" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and a.id = #{params.id}
+				</if>
+				<if test="params.title != null and params.title != ''">
+					and a.title like CONCAT('%',#{params.title},'%')
+				</if>
+				<if test="params.content != null and params.content != ''">
+					and a.content = #{params.content}
+				</if>
+				<if test="params.isOriginal != null and params.isOriginal != ''">
+					and a.is_original = #{params.isOriginal}
+				</if>
+				<if test="params.source != null and params.source != ''">
+					and a.source = #{params.source}
+				</if>
+				<if test="params.author != null and params.author != ''">
+					and a.author = #{params.author}
+				</if>
+				<if test="params.isTop != null and params.isTop != ''">
+					and a.is_top = #{params.isTop}
+				</if>
+				<if test="params.priority != null and params.priority != ''">
+					and a.priority = #{params.priority}
+				</if>
+				<if test="params.tags != null and params.tags != ''">
+					and a.tags = #{params.tags}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and a.status = #{params.status}
+				</if>
+				<if test="params.channelId != null and params.channelId != ''">
+					and a.channel_id = #{params.channelId}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and a.create_time = #{params.createTime}
+				</if>
+				<if test="params.modifyTime != null and params.modifyTime != ''">
+					and a.modify_time = #{params.modifyTime}
+				</if>
+				<if test="params.publishTime != null and params.publishTime != ''">
+					and a.publish_time = #{params.publishTime}
+				</if>
+				<if test="params.forbidComments != null and params.forbidComments != ''">
+					and a.forbid_comments = #{params.forbidComments}
+				</if>
+				<if test="params.coverImg != null and params.coverImg != ''">
+					and a.cover_img = #{params.coverImg}
+				</if>
+			</where>
+		order by a.create_time desc 
+	</select>
+	
+	<select id="select" resultType="com.game.news.domain.Article" parameterType="int">
+		select  id as id, title as title,intro as intro, content as content, is_original as isOriginal, source as source, author as author, is_top as isTop, priority as priority, tags as tags, status as status, channel_id as channelId, create_time as createTime, modify_time as modifyTime, publish_time as publishTime, forbid_comments as forbidComments, cover_img as coverImg from zst_article where id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.news.domain.Article" parameterType="com.game.news.domain.Article">
+		select  id as id, title as title,intro as intro, content as content, is_original as isOriginal, source as source, author as author, is_top as isTop, priority as priority, tags as tags, status as status, channel_id as channelId, create_time as createTime, modify_time as modifyTime, publish_time as publishTime, forbid_comments as forbidComments, cover_img as coverImg from zst_article
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="title != null and title != ''">
+					and title = #{title}
+				</if>
+				<if test="content != null and content != ''">
+					and content = #{content}
+				</if>
+				<if test="isOriginal != null and isOriginal != ''">
+					and is_original = #{isOriginal}
+				</if>
+				<if test="source != null and source != ''">
+					and source = #{source}
+				</if>
+				<if test="author != null and author != ''">
+					and author = #{author}
+				</if>
+				<if test="isTop != null and isTop != ''">
+					and is_top = #{isTop}
+				</if>
+				<if test="priority != null and priority != ''">
+					and priority = #{priority}
+				</if>
+				<if test="tags != null and tags != ''">
+					and tags = #{tags}
+				</if>
+				<if test="status != null and status != ''">
+					and status = #{status}
+				</if>
+				<if test="channelId != null and channelId != ''">
+					and channel_id = #{channelId}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="modifyTime != null and modifyTime != ''">
+					and modify_time = #{modifyTime}
+				</if>
+				<if test="publishTime != null and publishTime != ''">
+					and publish_time = #{publishTime}
+				</if>
+				<if test="forbidComments != null and forbidComments != ''">
+					and forbid_comments = #{forbidComments}
+				</if>
+				<if test="coverImg != null and coverImg != ''">
+					and cover_img = #{coverImg}
+				</if>
+			</where>
+		order by id desc 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.news.domain.Article" parameterType="int">
+		select  id as id, title as title,intro  as intro, content as content, is_original as isOriginal, source as source, author as author, is_top as isTop, priority as priority, tags as tags, status as status, channel_id as channelId, create_time as createTime, modify_time as modifyTime, publish_time as publishTime, forbid_comments as forbidComments, cover_img as coverImg from zst_article
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.news.domain.Article">
+		insert into zst_article
+		(
+			 title,intro, content, is_original, source, author, is_top, priority, tags, status, channel_id, create_time, modify_time, publish_time, forbid_comments, cover_img, page_url)
+		values 
+		(
+			 #{title} , #{intro},#{content} , #{isOriginal} , #{source} , #{author} , #{isTop} , #{priority} , #{tags} , #{status} , #{channelId} , #{createTime} , #{modifyTime} , #{publishTime} , #{forbidComments} , #{coverImg} , #{pageUrl})
+	</insert>
+
+	<update id="update" parameterType="com.game.news.domain.Article">
+		update zst_article 
+		set  id=#{id} , title=#{title} ,intro=#{intro}, content=#{content} , is_original=#{isOriginal} , source=#{source} , author=#{author} , is_top=#{isTop} , priority=#{priority} , tags=#{tags} , status=#{status} , channel_id=#{channelId} , modify_time=now() , forbid_comments=#{forbidComments} , cover_img=#{coverImg}  where id=#{id}
+	</update>
+	<update id="updateStatus" parameterType="com.game.news.domain.Article">
+		update zst_article 
+		set status=#{status} , publish_time=now()  where id=#{id}
+	</update>	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			delete from zst_article where id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	delete from zst_article where id in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

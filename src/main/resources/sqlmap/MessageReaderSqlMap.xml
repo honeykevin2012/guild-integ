@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.MessageReaderDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 
+			m.id as id,
+			m.user_id as user_id,
+			m.msg_id as msg_id,
+			m.title as title,
+			m.content as content,
+			m.send_time as send_time,
+			m.read_time as read_time,
+			m.type as type,
+			m.is_received as is_received,
+			m.status as status,
+			m.from_guild_id as from_guild_id,
+			a.id as att_id,
+			a.name as name,
+			a.type as att_type,
+			a.data_id as data_id,
+			a.quantity as quantity,
+			a.message_reader_id as message_reader_id,
+			a.order_id as order_id
+		FROM message_reader m left join message_reader_attach a on m.id=a.message_reader_id
+	</sql>
+	
+	<resultMap id="messageReaderResultMap" type="com.game.platform.domain.MessageReader">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="msgId" column="msg_id" />
+       	<result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="sendTime" column="send_time" />
+        <result property="readTime" column="read_time" />
+        <result property="type" column="type" />
+        <result property="isReceived" column="is_received" />
+        <result property="status" column="status" />
+        <result property="fromGuildId" column="from_guild_id" />
+        <collection property="attachs" ofType="com.game.platform.domain.MessageReaderAttach">
+        	<id property="id" column="att_id" />
+        	<id property="name" column="name" />
+        	<id property="type" column="att_type" />
+        	<id property="dataId" column="data_id" />
+        	<id property="quantity" column="quantity" />
+        	<id property="messageReaderId" column="message_reader_id" />
+        	<id property="orderId" column="order_id" />
+        </collection>
+    </resultMap>
+    
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultMap="messageReaderResultMap" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and m.id = #{params.id}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and m.user_id = #{params.userId}
+				</if>
+				<if test="params.msgId != null and params.msgId != ''">
+					and m.msg_id = #{params.msgId}
+				</if>
+				<if test="params.status != null and params.status != ''">
+					and m.status = #{params.status}
+				</if>
+			</where>
+		 ORDER BY m.send_time DESC 
+	</select>
+	
+	<select id="select" resultMap="messageReaderResultMap" parameterType="int">
+		<include refid="commonSelect"/> WHERE m.id=#{id}
+	</select>
+
+	<select id="selectByUserId" resultType="com.game.platform.domain.MessageReader" parameterType="int">
+		SELECT m.type,m.content FROM (SELECT 
+			TYPE,content
+			
+		FROM message_reader WHERE user_id=#{id} ORDER BY send_time DESC LIMIT 10) m
+		UNION ALL 
+		
+		(SELECT  4,gn.content FROM guild_members gm RIGHT JOIN guild_notice gn ON gm.guild_id=gn.guild_id
+		WHERE gm.user_id=#{id} LIMIT 1)
+	</select>
+	<select id="selectNewMsgCount" resultType="int" parameterType="int">
+		SELECT count(id) 
+			
+		FROM message_reader WHERE user_id=#{id} and status=0
+
+	</select>	
+	<select id="selectByEntity" resultType="com.game.platform.domain.MessageReader" parameterType="com.game.platform.domain.MessageReader">
+		SELECT  r.id, r.status,r.title,r.content,r.send_time AS createTime FROM message_reader r
+		<where>
+				<if test="id != null and id != ''">
+					and r.id = #{id}
+				</if>
+				<if test="userId != null and userId != ''">
+					and r.user_id = #{userId}
+				</if>
+				<if test="msgId != null and msgId != ''">
+					and r.msg_id = #{msgId}
+				</if>
+				<if test="status != null and status != ''">
+					and r.status = #{status}
+				</if>
+			</where>
+		ORDER BY r.send_time desc 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.MessageReader" parameterType="int">
+		SELECT  id, user_id, msg_id, status FROM message_reader
+	</select>
+	<select id="selectNewMsg" resultType="com.game.platform.domain.MessageReader" parameterType="map">
+		SELECT * FROM message_reader WHERE user_id=#{userId} AND id>#{msgId} AND STATUS=0 ORDER BY id DESC LIMIT 1
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.MessageReader">
+		INSERT INTO message_reader
+		(
+		    user_id, msg_id, status, title, content, is_received, send_time, read_time, type, from_guild_id
+		)
+		values 
+		(
+		    #{userId} , #{msgId} , #{status}, #{title}, #{content}, #{isReceived}, #{sendTime}, #{readTime}, #{type}, #{fromGuildId}     
+		)
+	</insert>
+
+	<insert id="insertByUserId" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.MessageReader">
+		INSERT INTO message_reader (msg_id, type, user_id, title, content, STATUS, send_time)
+		SELECT m.id, m.type, #{userId}, title, content, 0, create_time FROM message_publish m, USER u
+		WHERE u.id = #{userId} AND LOCATE(u.group_id, m.group_id) > 0 AND m.id 
+		NOT IN(SELECT msg_id FROM message_reader WHERE user_id = #{userId} AND msg_id IS NOT NULL)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.MessageReader">
+		UPDATE message_reader 
+		SET  id=#{id} , user_id=#{userId} , msg_id=#{msgId} , status=#{status}  WHERE id=#{id}
+	</update>
+	
+	<update id="updateReader" parameterType="int">
+		UPDATE message_reader SET status=1, read_time=now()  WHERE id=#{id}
+	</update>
+	
+	<update id="updateReceived" parameterType="int">
+		UPDATE message_reader SET is_received=1  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM message_reader WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM message_reader WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

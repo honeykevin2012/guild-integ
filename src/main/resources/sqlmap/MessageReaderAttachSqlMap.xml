@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.platform.persistence.dao.MessageReaderAttachDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT id,
+		type,
+		data_id,
+		quantity,
+		name,
+		message_reader_id FROM message_reader_attach
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.platform.domain.MessageReaderAttach" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.type != null and params.type != ''">
+					and type = #{params.type}
+				</if>
+				<if test="params.dataId != null and params.dataId != ''">
+					and data_id = #{params.dataId}
+				</if>
+				<if test="params.quantity != null and params.quantity != ''">
+					and quantity = #{params.quantity}
+				</if>
+				<if test="params.messageReaderId != null and params.messageReaderId != ''">
+					and message_reader_id = #{params.messageReaderId}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.platform.domain.MessageReaderAttach" parameterType="int">
+		SELECT  id, name, type, data_id, quantity, message_reader_id FROM message_reader_attach WHERE id=#{id}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.platform.domain.MessageReaderAttach" parameterType="com.game.platform.domain.MessageReaderAttach">
+		SELECT  id, name, type, data_id, quantity, message_reader_id FROM message_reader_attach
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="type != null and type != ''">
+					and type = #{type}
+				</if>
+				<if test="dataId != null and dataId != ''">
+					and data_id = #{dataId}
+				</if>
+				<if test="quantity != null and quantity != ''">
+					and quantity = #{quantity}
+				</if>
+				<if test="messageReaderId != null and messageReaderId != ''">
+					and message_reader_id = #{messageReaderId}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.platform.domain.MessageReaderAttach" parameterType="int">
+		SELECT  id, name, type, data_id, quantity, message_reader_id FROM message_reader_attach
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.platform.domain.MessageReaderAttach">
+		INSERT INTO message_reader_attach
+		(
+		    type, data_id, quantity, message_reader_id, name, order_id)
+		values 
+		(
+		    #{type} , #{dataId} , #{quantity} , #{messageReaderId}, #{name}, #{orderId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.platform.domain.MessageReaderAttach">
+		UPDATE message_reader_attach 
+		SET  id=#{id} , name=#{name}, type=#{type} , data_id=#{dataId} , quantity=#{quantity} , message_reader_id=#{messageReaderId}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM message_reader_attach WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM message_reader_attach WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

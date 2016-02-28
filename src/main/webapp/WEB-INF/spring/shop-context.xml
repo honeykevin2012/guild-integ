@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="versionDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.app.persistence.dao.VersionDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="appLoadimgDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.app.persistence.dao.AppLoadimgDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="productInfoDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.shop.persistence.dao.ProductInfoDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="productInfoVirtualDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.shop.persistence.dao.ProductInfoVirtualDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="refProductPromotionDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.game.shop.persistence.dao.RefProductPromotionDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+</beans>

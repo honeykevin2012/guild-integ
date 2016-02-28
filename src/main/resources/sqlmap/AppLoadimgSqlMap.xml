@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.app.persistence.dao.AppLoadimgDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		title,
+		pic_path,
+		pic_resolution,
+		create_time,
+		os_type,
+		is_valid,
+		effect_time,
+		failure_time FROM app_loadimg
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.app.domain.AppLoadimg" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.title != null and params.title != ''">
+					and title = #{params.title}
+				</if>
+				<if test="params.picPath != null and params.picPath != ''">
+					and pic_path = #{params.picPath}
+				</if>
+				<if test="params.picResolution != null and params.picResolution != ''">
+					and pic_resolution = #{params.picResolution}
+				</if>
+				<if test="params.createTime != null and params.createTime != ''">
+					and create_time = #{params.createTime}
+				</if>
+				<if test="params.osType != null and params.osType != ''">
+					and os_type = #{params.osType}
+				</if>
+				<if test="params.isValid != null and params.isValid != ''">
+					and is_valid = #{params.isValid}
+				</if>
+				<if test="params.effectTime != null and params.effectTime != ''">
+					and effect_time = #{params.effectTime}
+				</if>
+				<if test="params.failureTime != null and params.failureTime != ''">
+					and failure_time = #{params.failureTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="select" resultType="com.game.app.domain.AppLoadimg" parameterType="int">
+		SELECT  id, title, pic_path, pic_resolution, create_time, os_type, is_valid, effect_time, failure_time FROM app_loadimg WHERE id=#{id}
+	</select>
+	<select id="selectByOsType" resultType="com.game.app.domain.AppLoadimg" parameterType="int">
+		SELECT  id, title, pic_path, pic_resolution, create_time, os_type, is_valid, effect_time, failure_time FROM app_loadimg 
+		WHERE is_valid='1'
+		 and os_type=#{id}
+	</select>	
+	<select id="selectByEntity" resultType="com.game.app.domain.AppLoadimg" parameterType="com.game.app.domain.AppLoadimg">
+		SELECT  id, title, pic_path, pic_resolution, create_time, os_type, is_valid, effect_time, failure_time FROM app_loadimg
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="title != null and title != ''">
+					and title = #{title}
+				</if>
+				<if test="picPath != null and picPath != ''">
+					and pic_path = #{picPath}
+				</if>
+				<if test="picResolution != null and picResolution != ''">
+					and pic_resolution = #{picResolution}
+				</if>
+				<if test="createTime != null and createTime != ''">
+					and create_time = #{createTime}
+				</if>
+				<if test="osType != null and osType != ''">
+					and os_type = #{osType}
+				</if>
+				<if test="isValid != null and isValid != ''">
+					and is_valid = #{isValid}
+				</if>
+				<if test="effectTime != null and effectTime != ''">
+					and effect_time = #{effectTime}
+				</if>
+				<if test="failureTime != null and failureTime != ''">
+					and failure_time = #{failureTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.app.domain.AppLoadimg" parameterType="int">
+		SELECT  id, title, pic_path, pic_resolution, create_time, os_type, is_valid, effect_time, failure_time FROM app_loadimg
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.app.domain.AppLoadimg">
+		INSERT INTO app_loadimg
+		(
+		    title, pic_path, pic_resolution, create_time, os_type, is_valid, effect_time, failure_time)
+		values 
+		(
+		    #{title} , #{picPath} , #{picResolution} , #{createTime} , #{osType} , #{isValid} , #{effectTime} , #{failureTime} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.app.domain.AppLoadimg">
+		UPDATE app_loadimg 
+		SET  id=#{id} , title=#{title} , pic_path=#{picPath} , pic_resolution=#{picResolution} , create_time=#{createTime} , os_type=#{osType} , is_valid=#{isValid} , effect_time=#{effectTime} , failure_time=#{failureTime}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM app_loadimg WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM app_loadimg WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

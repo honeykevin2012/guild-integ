@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.game.adaptor.UserGameAdaptorDao">
+	<!--■■■■■■■■■■■■■■■■■■■■Cache■■■■■■■■■■■■■■■■■■■■-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/> 
+	<!-- <cache type="org.mybatis.caches.memcached.MemcachedCache"/> -->
+	<sql id="commonSelect">
+		SELECT 		id,
+		game_id,
+		user_id,
+		amount,
+		role_id,
+		role_name,
+		server_id,
+		server_name,
+		last_login_time,
+		last_logout_time FROM user_game_adaptor
+	</sql>
+	
+	<select id="pageQuery" parameterType="com.game.common.basics.pagination.PageQuery" resultType="com.game.adaptor.UserGameAdaptor" useCache="false">
+		<include refid="commonSelect"/>
+			<where>
+				<if test="params.id != null and params.id != ''">
+					and id = #{params.id}
+				</if>
+				<if test="params.gameId != null and params.gameId != ''">
+					and game_id = #{params.gameId}
+				</if>
+				<if test="params.userId != null and params.userId != ''">
+					and user_id = #{params.userId}
+				</if>
+				<if test="params.amount != null and params.amount != ''">
+					and amount = #{params.amount}
+				</if>
+				<if test="params.roleId != null and params.roleId != ''">
+					and role_id = #{params.roleId}
+				</if>
+				<if test="params.roleName != null and params.roleName != ''">
+					and role_name = #{params.roleName}
+				</if>
+				<if test="params.serverId != null and params.serverId != ''">
+					and server_id = #{params.serverId}
+				</if>
+				<if test="params.serverName != null and params.serverName != ''">
+					and server_name = #{params.serverName}
+				</if>
+				<if test="params.lastLoginTime != null and params.lastLoginTime != ''">
+					and last_login_time = #{params.lastLoginTime}
+				</if>
+				<if test="params.lastLogoutTime != null and params.lastLogoutTime != ''">
+					and last_logout_time = #{params.lastLogoutTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectBy" resultType="com.game.adaptor.UserGameAdaptor" parameterType="map">
+		SELECT  id, game_id, user_id, amount, role_id, role_name, 
+		server_id, server_name, last_login_time, last_logout_time 
+		FROM user_game_adaptor WHERE user_id=#{userId} and game_id=#{gameId} and server_id=#{serverId} and role_id=#{roleId}
+	</select>
+	
+	<select id="selectByEntity" resultType="com.game.adaptor.UserGameAdaptor" parameterType="com.game.adaptor.UserGameAdaptor">
+		SELECT  id, game_id, user_id, amount, role_id, role_name, server_id, server_name, last_login_time, last_logout_time FROM user_game_adaptor
+		<where>
+				<if test="id != null and id != ''">
+					and id = #{id}
+				</if>
+				<if test="gameId != null and gameId != ''">
+					and game_id = #{gameId}
+				</if>
+				<if test="userId != null and userId != ''">
+					and user_id = #{userId}
+				</if>
+				<if test="amount != null and amount != ''">
+					and amount = #{amount}
+				</if>
+				<if test="roleId != null and roleId != ''">
+					and role_id = #{roleId}
+				</if>
+				<if test="roleName != null and roleName != ''">
+					and role_name = #{roleName}
+				</if>
+				<if test="serverId != null and serverId != ''">
+					and server_id = #{serverId}
+				</if>
+				<if test="serverName != null and serverName != ''">
+					and server_name = #{serverName}
+				</if>
+				<if test="lastLoginTime != null and lastLoginTime != ''">
+					and last_login_time = #{lastLoginTime}
+				</if>
+				<if test="lastLogoutTime != null and lastLogoutTime != ''">
+					and last_logout_time = #{lastLogoutTime}
+				</if>
+			</where>
+		ORDER BY id DESC 
+	</select>
+	
+	<select id="selectAll" resultType="com.game.adaptor.UserGameAdaptor" parameterType="int">
+		SELECT  id, game_id, user_id, amount, role_id, role_name, server_id, server_name, last_login_time, last_logout_time FROM user_game_adaptor
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.game.adaptor.UserGameAdaptor">
+		INSERT INTO user_game_adaptor
+		(
+		    game_id, user_id, amount, role_id, role_name, server_id, server_name, last_login_time, last_logout_time)
+		values 
+		(
+		    #{gameId} , #{userId} , #{amount} , #{roleId} , #{roleName} , #{serverId} , #{serverName} , #{lastLoginTime} , #{lastLogoutTime} 
+		)
+	</insert>
+
+	<update id="update" parameterType="com.game.adaptor.UserGameAdaptor">
+		UPDATE user_game_adaptor 
+		SET  id=#{id} , game_id=#{gameId} , user_id=#{userId} , amount=#{amount} , role_id=#{roleId} , role_name=#{roleName} , server_id=#{serverId} , server_name=#{serverName} , last_login_time=#{lastLoginTime} , last_logout_time=#{lastLogoutTime}  WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		<![CDATA[
+			DELETE FROM user_game_adaptor WHERE id=#{id}
+		]]>
+	</delete>
+	<delete id="deleteSelect" parameterType="java.lang.Integer">
+       	DELETE FROM user_game_adaptor WHERE id IN
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>
